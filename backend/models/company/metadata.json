@@ -1,0 +1,90 @@
+{
+  "domain": "company",
+  "regression_target": "Profit",
+  "classification_target": "Risk_Flag",
+  "forecast_target": "Demand",
+  "rows": 900,
+  "training_feature_columns": [
+    "Product",
+    "Region",
+    "Sales",
+    "Inventory",
+    "Customers",
+    "Cost"
+  ],
+  "classification_feature_columns": [
+    "Product",
+    "Region",
+    "Sales",
+    "Inventory",
+    "Customers",
+    "Cost"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.8506449084495081,
+      "MAE": 828.7762213761239,
+      "RMSE": 982.6384873560901
+    },
+    "decision_tree": {
+      "R2": 0.7302970720271851,
+      "MAE": 1089.4103016329486,
+      "RMSE": 1320.4640586335993
+    },
+    "random_forest": {
+      "R2": 0.8256778582806984,
+      "MAE": 872.779316582113,
+      "RMSE": 1061.5978507428742
+    },
+    "gradient_boosting": {
+      "R2": 0.8134421368693633,
+      "MAE": 899.1101053622206,
+      "RMSE": 1098.2229963245452
+    },
+    "xgboost": {
+      "R2": 0.8000093791002139,
+      "MAE": 938.9020692270065,
+      "RMSE": 1137.0735791802608
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.9222222222222223,
+      "F1": 0.9068682249322493,
+      "ROC_AUC": 0.9144281362503461
+    },
+    "decision_tree": {
+      "Accuracy": 0.8722222222222222,
+      "F1": 0.871005291005291,
+      "ROC_AUC": 0.7719468291332041
+    },
+    "random_forest": {
+      "Accuracy": 0.9,
+      "F1": 0.8876543209876543,
+      "ROC_AUC": 0.8717806701744669
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.9055555555555556,
+      "F1": 0.898109540165615,
+      "ROC_AUC": 0.9127665466629742
+    },
+    "xgboost": {
+      "Accuracy": 0.8944444444444445,
+      "F1": 0.8861224272439225,
+      "ROC_AUC": 0.9061201883134866
+    }
+  },
+  "selected_regression": "company_regression_linear.joblib",
+  "selected_classification": "company_classification_logistic.joblib",
+  "forecasting_model": "company_forecasting_random_forest.joblib",
+  "anomaly_model": "company_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Sales",
+    "Demand",
+    "Inventory",
+    "Customers",
+    "Cost",
+    "Profit",
+    "Risk_Flag"
+  ]
+}

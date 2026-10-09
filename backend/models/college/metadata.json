@@ -1,0 +1,84 @@
+{
+  "domain": "college",
+  "regression_target": "Attendance",
+  "classification_target": "Attendance_Risk",
+  "forecast_target": "Attendance",
+  "rows": 900,
+  "training_feature_columns": [
+    "Department",
+    "Student_Count",
+    "Faculty_Count",
+    "Classroom_Utilization"
+  ],
+  "classification_feature_columns": [
+    "Department",
+    "Student_Count",
+    "Faculty_Count",
+    "Classroom_Utilization"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.4504690010470127,
+      "MAE": 4.309995039626146,
+      "RMSE": 5.360455416588934
+    },
+    "decision_tree": {
+      "R2": 0.27183959801859403,
+      "MAE": 4.828071995218997,
+      "RMSE": 6.170482419458514
+    },
+    "random_forest": {
+      "R2": 0.38727586955715776,
+      "MAE": 4.556660042765321,
+      "RMSE": 5.6602821793922695
+    },
+    "gradient_boosting": {
+      "R2": 0.3853935291428675,
+      "MAE": 4.559402311443019,
+      "RMSE": 5.668969945205196
+    },
+    "xgboost": {
+      "R2": 0.332019501133308,
+      "MAE": 4.776339870876736,
+      "RMSE": 5.910000018324126
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.9611111111111111,
+      "F1": 0.9420522505508342,
+      "ROC_AUC": 0.9430222956234516
+    },
+    "decision_tree": {
+      "Accuracy": 0.9611111111111111,
+      "F1": 0.9420522505508342,
+      "ROC_AUC": 0.6445086705202312
+    },
+    "random_forest": {
+      "Accuracy": 0.9722222222222222,
+      "F1": 0.9647040202595758,
+      "ROC_AUC": 0.782824112303881
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.9555555555555556,
+      "F1": 0.9392676767676768,
+      "ROC_AUC": 0.7630057803468209
+    },
+    "xgboost": {
+      "Accuracy": 0.9611111111111111,
+      "F1": 0.9505856283634061,
+      "ROC_AUC": 0.7902559867877788
+    }
+  },
+  "selected_regression": "college_regression_linear.joblib",
+  "selected_classification": "college_classification_random_forest.joblib",
+  "forecasting_model": "college_forecasting_random_forest.joblib",
+  "anomaly_model": "college_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Student_Count",
+    "Attendance",
+    "Faculty_Count",
+    "Classroom_Utilization",
+    "Attendance_Risk"
+  ]
+}

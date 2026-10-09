@@ -1,0 +1,84 @@
+{
+  "domain": "ngo",
+  "regression_target": "Beneficiaries",
+  "classification_target": "Coverage_Risk",
+  "forecast_target": "Beneficiaries",
+  "rows": 900,
+  "training_feature_columns": [
+    "District",
+    "Donations",
+    "Aid_Distributed",
+    "Volunteers"
+  ],
+  "classification_feature_columns": [
+    "District",
+    "Donations",
+    "Aid_Distributed",
+    "Volunteers"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.22542655702536774,
+      "MAE": 21.286879531424667,
+      "RMSE": 26.607419573220746
+    },
+    "decision_tree": {
+      "R2": 0.05888915063677669,
+      "MAE": 22.654119913252156,
+      "RMSE": 29.328634734529796
+    },
+    "random_forest": {
+      "R2": 0.21425891834308253,
+      "MAE": 21.027336338793894,
+      "RMSE": 26.79854326186672
+    },
+    "gradient_boosting": {
+      "R2": 0.23157281962589482,
+      "MAE": 20.21088923135028,
+      "RMSE": 26.501644001555178
+    },
+    "xgboost": {
+      "R2": 0.17519751009900886,
+      "MAE": 20.995110609266494,
+      "RMSE": 27.456579872010803
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.95,
+      "F1": 0.9497725122753278,
+      "ROC_AUC": 0.9853571428571428
+    },
+    "decision_tree": {
+      "Accuracy": 0.9055555555555556,
+      "F1": 0.9059692906765786,
+      "ROC_AUC": 0.9369642857142858
+    },
+    "random_forest": {
+      "Accuracy": 0.9388888888888889,
+      "F1": 0.9380223231813337,
+      "ROC_AUC": 0.9766071428571429
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.9277777777777778,
+      "F1": 0.9267536546688492,
+      "ROC_AUC": 0.9808928571428571
+    },
+    "xgboost": {
+      "Accuracy": 0.9444444444444444,
+      "F1": 0.9444444444444444,
+      "ROC_AUC": 0.9855357142857143
+    }
+  },
+  "selected_regression": "ngo_regression_gradient_boosting.joblib",
+  "selected_classification": "ngo_classification_logistic.joblib",
+  "forecasting_model": "ngo_forecasting_random_forest.joblib",
+  "anomaly_model": "ngo_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Beneficiaries",
+    "Donations",
+    "Aid_Distributed",
+    "Volunteers",
+    "Coverage_Risk"
+  ]
+}

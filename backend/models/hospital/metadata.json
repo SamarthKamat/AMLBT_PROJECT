@@ -1,0 +1,87 @@
+{
+  "domain": "hospital",
+  "regression_target": "Patients",
+  "classification_target": "Capacity_Risk",
+  "forecast_target": "Patients",
+  "rows": 900,
+  "training_feature_columns": [
+    "Department",
+    "Beds_Available",
+    "Beds_Occupied",
+    "Waiting_Time",
+    "Staff_Count"
+  ],
+  "classification_feature_columns": [
+    "Department",
+    "Beds_Available",
+    "Beds_Occupied",
+    "Waiting_Time",
+    "Staff_Count"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.8329081660989647,
+      "MAE": 7.170386813892979,
+      "RMSE": 8.740140873819323
+    },
+    "decision_tree": {
+      "R2": 0.7228502858991699,
+      "MAE": 8.69263303185352,
+      "RMSE": 11.25636163545694
+    },
+    "random_forest": {
+      "R2": 0.8052247804473772,
+      "MAE": 7.27210759701602,
+      "RMSE": 9.436428881182275
+    },
+    "gradient_boosting": {
+      "R2": 0.8023161942459264,
+      "MAE": 7.4219134418395845,
+      "RMSE": 9.506625077974144
+    },
+    "xgboost": {
+      "R2": 0.7849326306074981,
+      "MAE": 7.6514077207777245,
+      "RMSE": 9.915807371094877
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.9888888888888889,
+      "F1": 0.9861423220973783,
+      "ROC_AUC": 0.9962335216572505
+    },
+    "decision_tree": {
+      "Accuracy": 0.9833333333333333,
+      "F1": 0.9750700280112046,
+      "ROC_AUC": 0.6610169491525424
+    },
+    "random_forest": {
+      "Accuracy": 0.9833333333333333,
+      "F1": 0.9750700280112046,
+      "ROC_AUC": 0.9642184557438794
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.9833333333333333,
+      "F1": 0.9750700280112046,
+      "ROC_AUC": 0.8757062146892655
+    },
+    "xgboost": {
+      "Accuracy": 0.9833333333333333,
+      "F1": 0.9750700280112046,
+      "ROC_AUC": 0.9359698681732581
+    }
+  },
+  "selected_regression": "hospital_regression_linear.joblib",
+  "selected_classification": "hospital_classification_logistic.joblib",
+  "forecasting_model": "hospital_forecasting_random_forest.joblib",
+  "anomaly_model": "hospital_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Patients",
+    "Beds_Available",
+    "Beds_Occupied",
+    "Waiting_Time",
+    "Staff_Count",
+    "Capacity_Risk"
+  ]
+}

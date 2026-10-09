@@ -1,0 +1,87 @@
+{
+  "domain": "event_organizer",
+  "regression_target": "Attendance",
+  "classification_target": "Capacity_Risk",
+  "forecast_target": "Attendance",
+  "rows": 900,
+  "training_feature_columns": [
+    "Event",
+    "Capacity",
+    "Registrations",
+    "Revenue",
+    "Resources_Used"
+  ],
+  "classification_feature_columns": [
+    "Event",
+    "Capacity",
+    "Registrations",
+    "Revenue",
+    "Resources_Used"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.8691191132859195,
+      "MAE": 43.28950616852181,
+      "RMSE": 52.936407055270024
+    },
+    "decision_tree": {
+      "R2": 0.8123030897768933,
+      "MAE": 52.08122707325545,
+      "RMSE": 63.39352604870813
+    },
+    "random_forest": {
+      "R2": 0.8690314748201766,
+      "MAE": 43.19904023288464,
+      "RMSE": 52.954127324646436
+    },
+    "gradient_boosting": {
+      "R2": 0.8717501004029828,
+      "MAE": 42.18894665472447,
+      "RMSE": 52.4016381331202
+    },
+    "xgboost": {
+      "R2": 0.8614871755970342,
+      "MAE": 43.43186401367187,
+      "RMSE": 54.45795633091663
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.9722222222222222,
+      "F1": 0.971531957949615,
+      "ROC_AUC": 0.9852941176470588
+    },
+    "decision_tree": {
+      "Accuracy": 0.9277777777777778,
+      "F1": 0.9363808252697142,
+      "ROC_AUC": 0.8594117647058823
+    },
+    "random_forest": {
+      "Accuracy": 0.95,
+      "F1": 0.9301901536858558,
+      "ROC_AUC": 0.9676470588235294
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.9777777777777777,
+      "F1": 0.9777777777777777,
+      "ROC_AUC": 0.9723529411764706
+    },
+    "xgboost": {
+      "Accuracy": 0.9722222222222222,
+      "F1": 0.9698927189923588,
+      "ROC_AUC": 0.9664705882352941
+    }
+  },
+  "selected_regression": "event_organizer_regression_gradient_boosting.joblib",
+  "selected_classification": "event_organizer_classification_gradient_boosting.joblib",
+  "forecasting_model": "event_organizer_forecasting_random_forest.joblib",
+  "anomaly_model": "event_organizer_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Attendance",
+    "Capacity",
+    "Registrations",
+    "Revenue",
+    "Resources_Used",
+    "Capacity_Risk"
+  ]
+}

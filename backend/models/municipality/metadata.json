@@ -1,0 +1,82 @@
+{
+  "domain": "municipality",
+  "regression_target": "Waste_Collected",
+  "classification_target": "Service_Risk",
+  "forecast_target": "Complaints",
+  "rows": 900,
+  "training_feature_columns": [
+    "Zone",
+    "Population_Index",
+    "Workers"
+  ],
+  "classification_feature_columns": [
+    "Zone",
+    "Population_Index",
+    "Workers"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.8261470741463419,
+      "MAE": 31.530395568289926,
+      "RMSE": 39.40559220923013
+    },
+    "decision_tree": {
+      "R2": 0.7444761568052674,
+      "MAE": 38.72532507401821,
+      "RMSE": 47.77300633502987
+    },
+    "random_forest": {
+      "R2": 0.777173070022966,
+      "MAE": 36.30234386763682,
+      "RMSE": 44.61189743710552
+    },
+    "gradient_boosting": {
+      "R2": 0.7796511631949553,
+      "MAE": 35.177312086853895,
+      "RMSE": 44.36313592677338
+    },
+    "xgboost": {
+      "R2": 0.7504302586279118,
+      "MAE": 37.54647457885741,
+      "RMSE": 47.21313306423432
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.8,
+      "F1": 0.7111111111111111,
+      "ROC_AUC": 0.6781442901234568
+    },
+    "decision_tree": {
+      "Accuracy": 0.7611111111111111,
+      "F1": 0.7071171232411121,
+      "ROC_AUC": 0.6170910493827161
+    },
+    "random_forest": {
+      "Accuracy": 0.7722222222222223,
+      "F1": 0.7136507936507936,
+      "ROC_AUC": 0.6744791666666667
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.7833333333333333,
+      "F1": 0.7119504549277469,
+      "ROC_AUC": 0.6057098765432098
+    },
+    "xgboost": {
+      "Accuracy": 0.7611111111111111,
+      "F1": 0.7071171232411121,
+      "ROC_AUC": 0.6123649691358025
+    }
+  },
+  "selected_regression": "municipality_regression_linear.joblib",
+  "selected_classification": "municipality_classification_random_forest.joblib",
+  "forecasting_model": "municipality_forecasting_random_forest.joblib",
+  "anomaly_model": "municipality_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Population_Index",
+    "Waste_Collected",
+    "Complaints",
+    "Workers",
+    "Service_Risk"
+  ]
+}

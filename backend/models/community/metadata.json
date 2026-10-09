@@ -1,0 +1,84 @@
+{
+  "domain": "community",
+  "regression_target": "Resource_Requests",
+  "classification_target": "Shortage_Risk",
+  "forecast_target": "Resource_Requests",
+  "rows": 900,
+  "training_feature_columns": [
+    "Area",
+    "Population_Index",
+    "Participation",
+    "Shortage_Count"
+  ],
+  "classification_feature_columns": [
+    "Area",
+    "Population_Index",
+    "Participation",
+    "Shortage_Count"
+  ],
+  "regression_candidates": {
+    "linear": {
+      "R2": 0.8976890190472961,
+      "MAE": 14.02048215240449,
+      "RMSE": 17.645798482859867
+    },
+    "decision_tree": {
+      "R2": 0.8554360721035881,
+      "MAE": 16.640999191776302,
+      "RMSE": 20.97539561532287
+    },
+    "random_forest": {
+      "R2": 0.892741658459332,
+      "MAE": 14.276042140703257,
+      "RMSE": 18.067402911282304
+    },
+    "gradient_boosting": {
+      "R2": 0.8978427614610076,
+      "MAE": 14.147019828639195,
+      "RMSE": 17.632535353323668
+    },
+    "xgboost": {
+      "R2": 0.8929388619019017,
+      "MAE": 14.317971542358398,
+      "RMSE": 18.05078605330278
+    }
+  },
+  "classification_candidates": {
+    "logistic": {
+      "Accuracy": 0.9833333333333333,
+      "F1": 0.9832704506820349,
+      "ROC_AUC": 0.9995061728395062
+    },
+    "decision_tree": {
+      "Accuracy": 0.9944444444444445,
+      "F1": 0.9944646431635279,
+      "ROC_AUC": 0.9962962962962962
+    },
+    "random_forest": {
+      "Accuracy": 0.9944444444444445,
+      "F1": 0.9944646431635279,
+      "ROC_AUC": 1.0
+    },
+    "gradient_boosting": {
+      "Accuracy": 0.9944444444444445,
+      "F1": 0.9944646431635279,
+      "ROC_AUC": 0.9962962962962962
+    },
+    "xgboost": {
+      "Accuracy": 1.0,
+      "F1": 1.0,
+      "ROC_AUC": 1.0
+    }
+  },
+  "selected_regression": "community_regression_gradient_boosting.joblib",
+  "selected_classification": "community_classification_xgboost.joblib",
+  "forecasting_model": "community_forecasting_random_forest.joblib",
+  "anomaly_model": "community_anomaly_isolation_forest.joblib",
+  "anomaly_features": [
+    "Population_Index",
+    "Resource_Requests",
+    "Participation",
+    "Shortage_Count",
+    "Shortage_Risk"
+  ]
+}
