@@ -221,7 +221,10 @@ def compare_groups(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
         sub = work.dropna(subset=[tgt])
         ct = pd.crosstab(sub[keys[0]], sub[tgt].astype(str))
         share = ct.div(ct.sum(axis=1), axis=0) * 100
-        main = sub[tgt].astype(str).value_counts().index[0]
+        labels = sub[tgt].astype(str).value_counts()
+        # for a yes/no style outcome the question is about the event ("attrition rate" = share of 'Yes'), not the majority class
+        positive = next((l for l in labels.index if l.strip().lower() in ("yes", "1", "true", "churned", "late", "left", "default", "y")), None)
+        main = positive if (positive is not None and len(labels) == 2) else labels.index[0]
         tab = share.copy()
         tab.insert(0, "records", ct.sum(axis=1))
         tab = tab.sort_values(main, ascending=not desc)
@@ -233,7 +236,7 @@ def compare_groups(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
         except Exception:
             pass
         best, worst = tab.index[0], tab.index[-1]
-        summary = (f"'{main}' (the most common {tgt}) makes up {tab.loc[best, main]:.1f}% of '{best}' versus {tab.loc[worst, main]:.1f}% of '{worst}'.")
+        summary = (f"'{main}' ({'the event' if main == positive else 'the most common'} {tgt}) makes up {tab.loc[best, main]:.1f}% of '{best}' versus {tab.loc[worst, main]:.1f}% of '{worst}'.")
         metrics = {"Groups": int(len(tab)), f"Highest share of '{main}'": str(best), "Highest share %": float(tab.loc[best, main])}
         lim = ["Percentages are shares of each group's records; they describe association, not cause."]
         if p_val is not None:
@@ -268,7 +271,8 @@ def compare_groups(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
         measure_label = f"{AGG_LABEL[agg_eff]} of {tgt}"
     res = res.dropna(subset=["value"])
     res = res.sort_values("value", ascending=not desc)
-    overall = (len(work) if not tgt else _agg_series(work[tgt], agg_eff))
+    # reference level: for totals/counts the average group (a group total vs the grand total is meaningless)
+    overall = float(res["value"].mean()) if (agg_eff in ("sum", "count") or not tgt) else _agg_series(work[tgt], agg_eff)
     if overall not in (None, 0):
         res["vs_overall_%"] = (res["value"] - overall) / abs(overall) * 100
     if agg_eff in ("sum", "count") or not tgt:

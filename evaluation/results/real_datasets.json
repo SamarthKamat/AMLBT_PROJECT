@@ -1,0 +1,530 @@
+{
+  "real_datasets": {
+    "Global Superstore": {
+      "rows": 1000,
+      "columns": 24,
+      "missing_cells": 806,
+      "quality_score": 87.2,
+      "grade": "B",
+      "issues": 3,
+      "strong_pairs": 12,
+      "hierarchies": 6,
+      "derived": [],
+      "keys": [
+        "Row ID"
+      ],
+      "target": "Profit",
+      "task": "predict_value",
+      "model": {
+        "selected": "Random Forest Regressor",
+        "candidates": 5,
+        "cv": {
+          "RMSE": 395.6888161170999,
+          "RMSE_std": 43.26009000993024,
+          "MAE": 253.0082838015271,
+          "R2": 0.4771943200851701
+        },
+        "test": {
+          "MAE": 213.8516424266262,
+          "RMSE": 290.3576405407771,
+          "R2": 0.706740588765111
+        },
+        "baseline": {
+          "description": "always predicting the training mean",
+          "RMSE": 536.2070190377617
+        },
+        "rationale": "Gradient Boosting Regressor scored best (387.7), but Random Forest Regressor (395.7) is within one standard error (23.6) and is simpler, so it was preferred (one-standard-error rule). Hyperparameter tuning (randomised search, 5 settings) lowered 3-fold CV RMSE from 408.4 to 402 and was adopted.",
+        "p_vs_runner_up": 0.40437652166695504,
+        "temporal": {
+          "R2": 0.5542936815647788,
+          "RMSE": 339.34436339976793
+        },
+        "train_rows": 800,
+        "test_rows": 200,
+        "shap_top": [
+          [
+            "Discount",
+            44.6
+          ],
+          [
+            "Sales",
+            40.2
+          ],
+          [
+            "Shipping Cost",
+            4.1
+          ]
+        ],
+        "tuning_adopted": true
+      },
+      "seconds": {
+        "profile": 0.2,
+        "relationships": 0.43,
+        "automl": 17.7
+      }
+    },
+    "IBM HR Attrition": {
+      "rows": 1470,
+      "columns": 35,
+      "missing_cells": 0,
+      "quality_score": 100.0,
+      "grade": "A",
+      "issues": 5,
+      "strong_pairs": 15,
+      "hierarchies": 0,
+      "derived": [],
+      "keys": [
+        "EmployeeNumber"
+      ],
+      "target": "Attrition",
+      "task": "predict_class",
+      "model": {
+        "selected": "XGBoost Classifier",
+        "candidates": 5,
+        "cv": {
+          "F1": 0.7178059798734858,
+          "F1_std": 0.041597921519759704,
+          "Accuracy": 0.883508835196538
+        },
+        "test": {
+          "Accuracy": 0.8605442176870748,
+          "Precision": 0.779001798561151,
+          "Recall": 0.6068998191058661,
+          "F1": 0.6355555555555555,
+          "ROC_AUC": 0.7964510293737618,
+          "PR_AUC": 0.5040632290289021
+        },
+        "baseline": {
+          "description": "always predicting the most common class",
+          "accuracy": 0.8401360544217688
+        },
+        "rationale": "XGBoost Classifier has the best cross-validated score (0.7178 \u00b1 0.0416). Hyperparameter tuning did not improve the cross-validated score, so default settings were kept.",
+        "p_vs_runner_up": 0.03349330567666108,
+        "temporal": null,
+        "train_rows": 1176,
+        "test_rows": 294,
+        "shap_top": [
+          [
+            "OverTime",
+            13.4
+          ],
+          [
+            "MonthlyIncome",
+            7.7
+          ],
+          [
+            "Age",
+            6.6
+          ]
+        ],
+        "tuning_adopted": false
+      },
+      "seconds": {
+        "profile": 0.35,
+        "relationships": 0.8,
+        "automl": 13.3
+      }
+    },
+    "IBM Telco Churn": {
+      "rows": 7043,
+      "columns": 21,
+      "missing_cells": 11,
+      "quality_score": 100.0,
+      "grade": "A",
+      "issues": 1,
+      "strong_pairs": 37,
+      "hierarchies": 0,
+      "derived": [],
+      "keys": [
+        "customerID"
+      ],
+      "target": "Churn",
+      "task": "predict_class",
+      "model": {
+        "selected": "Random Forest Classifier",
+        "candidates": 5,
+        "cv": {
+          "F1": 0.7337981050121364,
+          "F1_std": 0.012421101362875378,
+          "Accuracy": 0.7882499112531062
+        },
+        "test": {
+          "Accuracy": 0.7806955287437899,
+          "Precision": 0.7219325346174673,
+          "Recall": 0.7371683587796121,
+          "F1": 0.7284566069814771,
+          "ROC_AUC": 0.8342801415691442,
+          "PR_AUC": 0.64003479778349
+        },
+        "baseline": {
+          "description": "always predicting the most common class",
+          "accuracy": 0.7345635202271115
+        },
+        "rationale": "Random Forest Classifier has the best cross-validated score (0.7338 \u00b1 0.0124).",
+        "p_vs_runner_up": 0.37816255762346995,
+        "temporal": null,
+        "train_rows": 5634,
+        "test_rows": 1409,
+        "shap_top": [
+          [
+            "Contract",
+            19.0
+          ],
+          [
+            "InternetService",
+            13.7
+          ],
+          [
+            "tenure",
+            11.6
+          ]
+        ],
+        "tuning_adopted": null
+      },
+      "seconds": {
+        "profile": 0.53,
+        "relationships": 1.19,
+        "automl": 28.1
+      }
+    },
+    "UCI Bank Marketing": {
+      "rows": 41188,
+      "columns": 21,
+      "missing_cells": 0,
+      "quality_score": 99.8,
+      "grade": "A",
+      "issues": 3,
+      "strong_pairs": 20,
+      "hierarchies": 0,
+      "derived": [],
+      "keys": [],
+      "target": "y",
+      "task": "predict_class",
+      "model": {
+        "selected": "Random Forest Classifier",
+        "candidates": 5,
+        "cv": {
+          "F1": 0.7823651089554023,
+          "F1_std": 0.010557701855607076,
+          "Accuracy": 0.9074997844470641
+        },
+        "test": {
+          "Accuracy": 0.91375,
+          "Precision": 0.7816323001772361,
+          "Recall": 0.8058685446009389,
+          "F1": 0.7930095733072345,
+          "ROC_AUC": 0.9440882629107981,
+          "PR_AUC": 0.6607223435557135
+        },
+        "baseline": {
+          "description": "always predicting the most common class",
+          "accuracy": 0.8875
+        },
+        "rationale": "Random Forest Classifier has the best cross-validated score (0.7824 \u00b1 0.0106).",
+        "p_vs_runner_up": 0.06627522300444755,
+        "temporal": null,
+        "train_rows": 16000,
+        "test_rows": 4000,
+        "shap_top": [
+          [
+            "duration",
+            33.6
+          ],
+          [
+            "emp.var.rate",
+            12.4
+          ],
+          [
+            "nr.employed",
+            9.5
+          ]
+        ],
+        "tuning_adopted": null
+      },
+      "seconds": {
+        "profile": 2.43,
+        "relationships": 2.44,
+        "automl": 45.2
+      }
+    }
+  },
+  "robustness": {
+    "IBM HR Attrition": {
+      "injected": {
+        "missing": 294,
+        "outliers": 29,
+        "negatives": 14,
+        "label_variants": 73,
+        "duplicates": 44
+      },
+      "detected": {
+        "missing": 300,
+        "duplicates": 44,
+        "outliers": 29,
+        "negatives": 14,
+        "label_variants": 73
+      },
+      "recall": {
+        "missing": 1.0,
+        "outliers": 1.0,
+        "negatives": 1.0,
+        "label_variants": 1.0,
+        "duplicates": 1.0
+      },
+      "quality": {
+        "original": 100.0,
+        "corrupted": 92.3,
+        "cleaned": 99.9
+      },
+      "cleaning_actions": 5,
+      "model": {
+        "original": {
+          "model": "XGBoost Classifier",
+          "F1": 0.6356,
+          "ROC_AUC": 0.7965
+        },
+        "corrupted": {
+          "model": "Gradient Boosting Classifier",
+          "F1": 0.6178,
+          "ROC_AUC": 0.8113
+        },
+        "cleaned": {
+          "model": "XGBoost Classifier",
+          "F1": 0.6473,
+          "ROC_AUC": 0.7908
+        }
+      }
+    },
+    "IBM Telco Churn": {
+      "injected": {
+        "missing": 1408,
+        "outliers": 140,
+        "negatives": 70,
+        "label_variants": 352,
+        "duplicates": 211
+      },
+      "detected": {
+        "missing": 1434,
+        "duplicates": 211,
+        "outliers": 140,
+        "negatives": 70,
+        "label_variants": 361
+      },
+      "recall": {
+        "missing": 1.0,
+        "outliers": 1.0,
+        "negatives": 1.0,
+        "label_variants": 1.0,
+        "duplicates": 1.0
+      },
+      "quality": {
+        "original": 100.0,
+        "corrupted": 92.0,
+        "cleaned": 99.8
+      },
+      "cleaning_actions": 6,
+      "model": {
+        "original": {
+          "model": "Random Forest Classifier",
+          "F1": 0.7285,
+          "ROC_AUC": 0.8343
+        },
+        "corrupted": {
+          "model": "Random Forest Classifier",
+          "F1": 0.7315,
+          "ROC_AUC": 0.835
+        },
+        "cleaned": {
+          "model": "Random Forest Classifier",
+          "F1": 0.7247,
+          "ROC_AUC": 0.8325
+        }
+      }
+    }
+  },
+  "forecasting": {
+    "selected": "ARIMA / SARIMA (AIC-selected)",
+    "metrics": {
+      "MAE": 10849.542489168922,
+      "RMSE": 13835.778646415632,
+      "MAPE": 24.147746146239797
+    },
+    "baseline": {
+      "model": "Moving average",
+      "RMSE": 15913.83941669206,
+      "MAE": 12862.089722222221,
+      "MAPE": 25.705418334036334,
+      "selected": false
+    },
+    "skill_%": 13.058198690234024,
+    "candidates": [
+      {
+        "model": "ARIMA / SARIMA (AIC-selected)",
+        "RMSE": 13835.778646415632,
+        "MAE": 10849.542489168922,
+        "MAPE": 24.147746146239797
+      },
+      {
+        "model": "Linear trend + seasonal profile",
+        "RMSE": 14237.995271834761,
+        "MAE": 9975.917662343432,
+        "MAPE": 25.10476692274884
+      },
+      {
+        "model": "Holt-Winters ETS (damped trend + seasonal)",
+        "RMSE": 14808.33984149574,
+        "MAE": 11632.436298644536,
+        "MAPE": 27.009098596367547
+      },
+      {
+        "model": "Autoregressive Ridge (lags + trend)",
+        "RMSE": 15376.159099198703,
+        "MAE": 12412.630156715013,
+        "MAPE": 28.501609868006792
+      },
+      {
+        "model": "Random Forest (lags)",
+        "RMSE": 15695.051291529051,
+        "MAE": 13524.523189904112,
+        "MAPE": 29.51108328045537
+      },
+      {
+        "model": "Moving average",
+        "RMSE": 15913.83941669206,
+        "MAE": 12862.089722222221,
+        "MAPE": 25.705418334036334
+      },
+      {
+        "model": "Seasonal naive",
+        "RMSE": 20658.77792346095,
+        "MAE": 17330.028888888886,
+        "MAPE": 38.54183658502054
+      },
+      {
+        "model": "Gradient Boosting (lags)",
+        "RMSE": 22118.165996867483,
+        "MAE": 18814.146531887753,
+        "MAPE": 47.735239213207855
+      },
+      {
+        "model": "Naive (last value)",
+        "RMSE": 26556.254036344428,
+        "MAE": 24443.468333333338,
+        "MAPE": 66.6474258913829
+      }
+    ],
+    "folds": {
+      "folds": 3,
+      "test_block_periods": 6,
+      "min_train_periods": 12
+    }
+  },
+  "reference_domains": {
+    "company": {
+      "regression": {
+        "target": "Profit",
+        "model": "Linear Regression",
+        "R2": 0.873,
+        "cv_RMSE": 948.28,
+        "cv_RMSE_std": 15.93
+      },
+      "classification": {
+        "target": "Risk_Flag",
+        "model": "Decision Tree Classifier",
+        "F1": 0.987,
+        "cv_F1_std": 0.0
+      }
+    },
+    "hospital": {
+      "regression": {
+        "target": "Patients",
+        "model": "Linear Regression",
+        "R2": 0.836,
+        "cv_RMSE": 8.92,
+        "cv_RMSE_std": 0.55
+      },
+      "classification": {
+        "target": "Capacity_Risk",
+        "model": "Logistic Regression",
+        "F1": 0.721,
+        "cv_F1_std": 0.044
+      }
+    },
+    "college": {
+      "regression": {
+        "target": "Attendance",
+        "model": "Linear Regression",
+        "R2": 0.469,
+        "cv_RMSE": 5.58,
+        "cv_RMSE_std": 0.35
+      },
+      "classification": {
+        "target": "Attendance_Risk",
+        "model": "Decision Tree Classifier",
+        "F1": 1.0,
+        "cv_F1_std": 0.0
+      }
+    },
+    "municipality": {
+      "regression": {
+        "target": "Waste_Collected",
+        "model": "Linear Regression",
+        "R2": 0.832,
+        "cv_RMSE": 35.79,
+        "cv_RMSE_std": 2.83
+      },
+      "classification": {
+        "target": "Service_Risk",
+        "model": "Decision Tree Classifier",
+        "F1": 0.982,
+        "cv_F1_std": 0.009
+      }
+    },
+    "ngo": {
+      "regression": {
+        "target": "Beneficiaries",
+        "model": "Linear Regression",
+        "R2": 0.281,
+        "cv_RMSE": 24.06,
+        "cv_RMSE_std": 1.28
+      },
+      "classification": {
+        "target": "Coverage_Risk",
+        "model": "XGBoost Classifier",
+        "F1": 1.0,
+        "cv_F1_std": 0.009
+      }
+    },
+    "community": {
+      "regression": {
+        "target": "Resource_Requests",
+        "model": "Linear Regression",
+        "R2": 0.898,
+        "cv_RMSE": 18.97,
+        "cv_RMSE_std": 1.61
+      },
+      "classification": {
+        "target": "Shortage_Risk",
+        "model": "Decision Tree Classifier",
+        "F1": 0.993,
+        "cv_F1_std": 0.01
+      }
+    },
+    "event_organizer": {
+      "regression": {
+        "target": "Attendance",
+        "model": "Linear Regression",
+        "R2": 0.873,
+        "cv_RMSE": 48.4,
+        "cv_RMSE_std": 2.23
+      },
+      "classification": {
+        "target": "Capacity_Risk",
+        "model": "Logistic Regression",
+        "F1": 0.794,
+        "cv_F1_std": 0.018
+      }
+    }
+  },
+  "seconds_total": 373.1
+}

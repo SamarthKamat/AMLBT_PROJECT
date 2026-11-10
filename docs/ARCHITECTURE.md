@@ -1,57 +1,63 @@
-# UDI architecture
+# UDI 2.0 architecture
 
 ```text
-React UI (frontend/src)                                   Flask API (backend/app.py)
-  upload ─────────────────────────────────────────────►  /api/upload   load_dataset → profile_dataframe → roles → Session
-  question ───────────────────────────────────────────►  /api/chat
-                                                              │
-                                                              ▼
-                                                    planner.PlanningService
-                                                    profile_for_llm (schema+stats+≤3 rows) + last 4 turns
-                                                              │
-                                                              ▼
-                                                    gemini_client.GeminiService.plan  → AnalysisPlan (pydantic JSON)
-                                                              │      (GEMINI_* errors stop here; no fallback)
-                                                              ▼
-                                                    validator.validate_plan
-                                                      columns exist? types fit? filters match real values?
-                                                      enough data? → ValidatedPlan | ClarificationNeeded | UDIError
-                                                              │
-                                                              ▼
-                                                    executor.execute → OPERATION_TABLE[operation]
-        get_summary / get_current_state / compare_groups ....... analytics_engine   (pandas, no ML)
-        analyze_trend / calculate_correlation .................. diagnostics_engine (Mann–Kendall, Pearson/Spearman, η, Cramér's V)
-        detect_anomalies ....................................... anomaly_engine     (IQR, z-score, Isolation Forest)
-        predict_value / predict_class / run_scenario ........... ml_engine          (candidate models, CV selection, hold-out metrics, cache)
-        forecast ............................................... forecasting_engine (rolling-origin backtest)
-                                                              │
-                                                              ▼
-                                                    verified result (result_formatter.jsonsafe)
-                                                              │
-                                                              ▼
-                                                    planner.explain_result → Gemini wording, accepted only if every number
-                                                    traces to the result (explainer.check_grounded); else Python summary
-                                                              │
-                                                              ▼
-React: ResultView (metrics, charts, tables, confusion matrix, importance, limitations, details) · ErrorCard · status chip
+React UI (frontend/src)                                         Flask API (backend/app.py, served by waitress: serve.py)
+  Ask · Relationships · EDA · Data quality · Reports · History
+  upload / bundled dataset ────────────────────────────────►  /api/upload, /api/samples/load
+                                                              load_dataset → Session.set_dataset: profile, roles, semantics,
+                                                              relationships, LLM profile → SQLite + snapshot (storage.py)
+  question ────────────────────────────────────────────────►  /api/chat
+                                                                │
+   Planner agent  planner.PlanningService  ── auto | gemini | local
+        gemini_client.GeminiService.plan   (schema, semantics, relationship digest, ≤3 sample rows, last 4 turns)
+        local_planner.LocalPlanner         (schema linking → masking → TF-IDF+LR intent model → slot filling)
+                                                                ▼
+   Validation gate  validator.validate_plan  columns exist (never substituted) · types · filters vs real values · sufficiency
+                                                                ▼
+   Analyst / ML agent  executor.execute → OPERATION_TABLE (18 operations)
+        analytics_engine     get_summary · get_current_state · compare_groups
+        diagnostics_engine   analyze_trend · calculate_correlation
+        anomaly_engine       detect_anomalies
+        ml_engine            predict_value · predict_class · run_scenario  (AutoML + explainability_engine SHAP)
+        forecasting_engine   forecast  (9 candidates incl. ETS, ARIMA/SARIMA; rolling-origin backtest)
+        business_engine      query_records · pivot_table · explain_change · segment_records
+        eda_engine           run_eda · assess_data_quality (data_quality.py) · describe_relationships (relationships.py)
+        report_engine        generate_report  → agents.build_report (multi-agent) → PDF / Excel / JSON
+                                                                ▼
+   Business Analyst agent  business_analyst.business_insights  findings · suggested actions · evidence · priority
+                                                                ▼
+   Narrator  planner.explain_result  Gemini wording accepted only if every number traces to the verified result
+                                                                ▼
+   response {answer, plan, result, planner, agent_trace, timing}  → ResultView (metrics, charts, insights, SHAP, trace)
 ```
 
 ## Modules
 | File | Role |
 |---|---|
-| `config.py` | Environment, paths, the seven domain context blocks. |
-| `schemas.py` | `AnalysisPlan` and the operation list (the only vocabulary Gemini may use). |
-| `gemini_client.py` | Prompts, JSON schema, error mapping, plan + explain calls. |
-| `data_profiler.py` | Loading, coercion, role inference (numeric/categorical/datetime/identifier/…), profile. |
-| `validator.py`, `filtering.py` | Plan validation against data, filters with real-value matching, sufficiency checks. |
-| `preprocessing.py`, `context.py` | Feature selection and encoding; per-session model cache. |
-| `*_engine.py`, `executor.py` | The ten operations and their dispatcher (asserted equal to the operation list). |
-| `session_manager.py` | In-memory sessions: dataset, conversation, pending clarification, routing log, cache. |
-| `reference_models.py`, `train_models.py`, `models/`, `sample_data/` | Reference/validation/demo only; never loaded when answering questions. |
+| `config.py` | Environment, paths, domains, planner mode, auth, rate limits, bundled datasets. |
+| `schemas.py` | `AnalysisPlan` and the 18-operation vocabulary. |
+| `gemini_client.py` | Gemini prompts (all 18 operations), JSON schema, error mapping. |
+| `local_planner.py`, `planner_corpus.py`, `train_planner.py` | Offline planner: schema linker, masking, intent classifier, slot filling; corpus and training. |
+| `planner.py` | Planning modes and grounded explanation. |
+| `data_profiler.py` | Loading, type coercion, role inference, profile. |
+| `semantics.py` | Business semantic type of every column (money, quantity, rate, geography, outcome, …), additivity, business functions. |
+| `relationships.py` | Association matrix, hierarchies, derived columns, duplicates, date rules, keys, data dictionary. |
+| `data_quality.py` | Quality score, issues and treatments, cleaning actions, before/after comparison. |
+| `validator.py`, `filtering.py` | Plan validation and filters. |
+| `*_engine.py`, `executor.py` | The operations and their dispatcher. |
+| `explainability_engine.py` | Permutation-sampling Shapley values (global + local, waterfall). |
+| `business_analyst.py`, `agents.py`, `report_engine.py` | Business findings, multi-agent report orchestration, PDF/Excel rendering. |
+| `session_manager.py`, `storage.py` | Sessions with owner, persistence in SQLite + dataset snapshots, restore after restart, deletion. |
+| `ops.py` | Authentication/authorisation, rate limiting, background jobs, metrics. |
+| `reference_models.py`, `train_models.py`, `models/<domain>/` | Phase 1 reference models (validation/demo only). |
+
+## Key formulas
+* Quality score: `Q = Σ_d w_d · 100 · (1 − min(1, k_d · r_d))`, weights (.30,.20,.20,.15,.15), sensitivities (1,4,4,4,2) for completeness, uniqueness, validity, consistency, outliers.
+* Association: |Pearson| or |Spearman| (numeric–numeric), η = √(SS_between/SS_total) (numeric–categorical), bias-corrected Cramér's V (categorical–categorical).
+* SHAP: `φ_j = 1/K Σ_k [f(z_{π_k,≤j}) − f(z_{π_k,<j})]` over K antithetic orderings paired with K background rows; `f(x) = φ_0 + Σ φ_j` exactly.
+* Model selection: among candidates within one standard error of the best CV score (σ/√folds) choose the least complex.
+* Root cause (sum KPI): `Δ = Σ_g (M_gB − M_gA)`; (mean KPI): `Δ = Σ (w_gB − w_gA) m_gA + Σ w_gB (m_gB − m_gA)`.
 
 ## Result contract
-`{success, operation, title, summary, metrics, table, table_title, tables{}, charts[], evaluation, explainability, forecast, scenario, prediction, limitations[], assumptions[], warnings[], provenance}`.
-Chart types: `bar` (optionally horizontal), `line` (one or several series), `scatter` (optional highlight / identity line), `forecast` (actual, forecast, 80% band).
-
-## Follow-ups
-The last four turns (question, executed plan, digest of the verified result) go to Gemini, which returns a complete plan carrying over target/aggregation/filters and sets `uses_previous_context`. A clarification is stored as `pending_clarification` and shown to Gemini with the next message. "New chat" and re-upload delete the context and cached models.
+`{success, operation, title, summary, metrics, table, table_title, tables{}, charts[], insights[], business_insights[], evaluation, explainability{items, shap, local}, forecast, scenario, prediction, report, quality, relationships, preferred_chart, limitations[], assumptions[], warnings[], provenance}`.
+Chart types: `bar` (horizontal / grouped / stacked), `line`, `area`, `pie`, `scatter` (highlight / group / identity), `forecast` (80 % and 95 % bands), `heatmap`, `box`, `waterfall`.

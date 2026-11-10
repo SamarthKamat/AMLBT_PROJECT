@@ -11,3 +11,8 @@ frontend/dist/
 __pycache__/
 *.pyc
 *.zip
+backend/data/
+report/*.aux
+report/*.log
+report/*.out
+evaluation/results/__pycache__/

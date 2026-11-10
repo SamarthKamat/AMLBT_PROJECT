@@ -1,0 +1,105 @@
+id,dataset,question,gold_op,planned_op,gold_target,planned_target,gold_group,planned_group,status,seconds,intent_ok,columns_ok,filters_ok,rejection_ok,answered,numeric_ok,oracle,returned,pass
+superstore-01,superstore,Which country generated the most sales?,compare_groups,compare_groups,Sales,Sales,Country,Country,answer,0.08,True,True,,,True,True,Australia,Australia,True
+superstore-02,superstore,Which market has the lowest total profit?,compare_groups,compare_groups,Profit,Profit,Market,Market,answer,0.02,True,True,,,True,True,USCA,USCA,True
+superstore-03,superstore,What's the average discount we give?,get_summary,get_summary,Discount,Discount,,,answer,0.01,True,True,,,True,True,0.09284,0.09284,True
+superstore-04,superstore,How much profit did we make in total?,get_summary,get_summary,Profit,Profit,,,answer,0.01,True,True,,,True,True,288920.44000000006,288920.44000000006,True
+superstore-05,superstore,Rank the product categories by sales,compare_groups,compare_groups,Sales,Sales,Category,Category,answer,0.02,True,True,,,True,,,,True
+superstore-06,superstore,Which sub-category earns the highest profit?,compare_groups,compare_groups,Profit,Profit,Sub-Category,Sub-Category,answer,0.02,True,True,,,True,True,Phones,Phones,True
+superstore-07,superstore,Average shipping cost per ship mode,compare_groups,compare_groups,Shipping Cost,Shipping Cost,Ship Mode,Ship Mode,answer,0.02,True,True,,,True,True,Same Day,Same Day,True
+superstore-08,superstore,Is profit trending up over time?,analyze_trend,analyze_trend,Profit,Profit,,,answer,0.02,True,True,,,True,,,,True
+superstore-09,superstore,Predict sales for the next 6 months,forecast,forecast,Sales,Sales,,,answer,2.54,True,True,,,True,,,,True
+superstore-10,superstore,Any unusual sales amounts?,detect_anomalies,detect_anomalies,Sales,Sales,,,answer,0.32,True,True,,,True,,,,True
+superstore-11,superstore,What is correlated with profit?,calculate_correlation,calculate_correlation,Profit,Profit,,,answer,0.05,True,True,,,True,,,,True
+superstore-12,superstore,Show me the 10 biggest orders by sales,query_records,query_records,Sales,Sales,,,answer,0.01,True,True,,,True,,,,True
+superstore-13,superstore,List the orders from India with the lowest profit,query_records,query_records,Profit,Profit,,,answer,0.02,True,True,True,,True,,,,True
+superstore-14,superstore,Total sales by market and category,pivot_table,pivot_table,Sales,Sales,Market,Market,answer,0.02,True,True,,,True,,,,True
+superstore-15,superstore,Why did profit fall last quarter?,explain_change,explain_change,Profit,Profit,,,answer,0.03,True,True,,,True,,,,True
+superstore-16,superstore,Cluster the orders into groups,segment_records,segment_records,,,,,answer,0.85,True,,,,True,,,,True
+superstore-17,superstore,Create a sales report for management,generate_report,generate_report,,Sales,,,answer,20.84,True,,,,True,,,,True
+superstore-18,superstore,How clean is this dataset?,assess_data_quality,assess_data_quality,,,,,answer,0.02,True,,,,True,,,,True
+superstore-19,superstore,Explain how the columns relate to each other,describe_relationships,describe_relationships,,,,,answer,0.01,True,,,,True,,,,True
+superstore-20,superstore,What if the discount went up by 10 percent - what happens to profit?,run_scenario,run_scenario,Profit,Profit,,,answer,17.65,True,True,,,True,,,,True
+superstore-21,superstore,Breakdown of orders by order priority,get_summary,get_summary,Order Priority,Order Priority,,,answer,0.02,True,True,,,True,,,,True
+superstore-22,superstore,What's the average customer rating?,get_summary,get_summary,,customer rating,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+superstore-23,superstore,Forecast the number of returns next month,forecast,forecast,,,,,clarification,0.01,True,,,True,,,,,True
+superstore-24,superstore,Book a meeting with the regional manager,unsupported,unsupported,,,,,UNSUPPORTED_OPERATION,0.01,True,,,True,,,,,True
+superstore-25,superstore,Profit by segment for the Europe market,compare_groups,compare_groups,Profit,Profit,Segment,Segment,answer,0.03,True,True,True,,True,,,,True
+hr-01,hr,Which department has the highest attrition rate?,compare_groups,compare_groups,Attrition,Attrition,Department,Department,answer,0.03,True,True,,,True,True,Sales,Sales,True
+hr-02,hr,What is the average monthly income?,get_summary,get_summary,MonthlyIncome,MonthlyIncome,,,answer,0.01,True,True,,,True,True,6502.931292517007,6502.931292517007,True
+hr-03,hr,Average monthly income by job role,compare_groups,compare_groups,MonthlyIncome,MonthlyIncome,JobRole,JobRole,answer,0.02,True,True,,,True,True,Manager,Manager,True
+hr-04,hr,What factors predict attrition?,predict_class,predict_class,Attrition,Attrition,,,answer,14.36,True,True,,,True,,,,True
+hr-05,hr,Will an employee who works overtime leave the company?,predict_class,predict_class,Attrition,Attrition,,,answer,14.22,True,True,,,True,,,,True
+hr-06,hr,How many employees are there?,get_summary,get_summary,,,,,answer,0.01,True,,,,True,True,1470.0,1470,True
+hr-07,hr,Show the gender split,get_summary,get_summary,Gender,Gender,,,answer,0.01,True,True,,,True,,,,True
+hr-08,hr,Which education field has the lowest job satisfaction?,compare_groups,compare_groups,JobSatisfaction,JobSatisfaction,EducationField,EducationField,answer,0.02,True,True,,,True,True,Human Resources,Human Resources,True
+hr-09,hr,Are there outliers in monthly income?,detect_anomalies,detect_anomalies,MonthlyIncome,MonthlyIncome,,,answer,0.32,True,True,,,True,,,,True
+hr-10,hr,What is related to years at company?,calculate_correlation,calculate_correlation,YearsAtCompany,YearsAtCompany,,,answer,0.08,True,True,,,True,,,,True
+hr-11,hr,Estimate monthly income for someone with 10 total working years,predict_value,predict_value,MonthlyIncome,MonthlyIncome,,,answer,24.56,True,True,,,True,,,,True
+hr-12,hr,Prepare an HR report,generate_report,generate_report,,,,,answer,14.16,True,,,,True,,,,True
+hr-13,hr,Group employees into segments,segment_records,segment_records,,,,,answer,0.92,True,,,,True,,,,True
+hr-14,hr,Do an exploratory analysis of the data,run_eda,run_eda,,,,,answer,0.11,True,,,,True,,,,True
+hr-15,hr,Median age of employees,get_summary,segment_records,Age,,,,answer,0.93,False,False,,,True,False,36.0,,False
+hr-16,hr,List employees in Research & Development with monthly income above 15000,query_records,query_records,,,,,answer,0.01,True,,True,,True,,,,True
+hr-17,hr,Attrition by department and overtime,pivot_table,pivot_table,,Attrition,Department,Department,answer,0.02,True,True,,,True,,,,True
+hr-18,hr,What is the average bonus paid?,get_summary,get_summary,,bonus paid,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+hr-19,hr,Forecast monthly income for next year,forecast,forecast,,MonthlyIncome,,,INSUFFICIENT_DATA,0.01,True,,,True,,,,,True
+hr-20,hr,Which job role has the most employees?,compare_groups,compare_groups,,,JobRole,JobRole,answer,0.01,True,True,,,True,True,Sales Executive,Sales Executive,True
+telco-01,telco,Which contract type has the highest churn rate?,compare_groups,compare_groups,Churn,Churn,Contract,Contract,answer,0.03,True,True,,,True,True,Month-to-month,Month-to-month,True
+telco-02,telco,What is the average monthly charge?,get_summary,get_summary,MonthlyCharges,MonthlyCharges,,,answer,0.01,True,True,,,True,True,64.76169246059918,64.76169246059918,True
+telco-03,telco,Predict which customers will churn,predict_class,predict_class,Churn,Churn,,,answer,26.7,True,True,,,True,,,,True
+telco-04,telco,Total charges by payment method,compare_groups,compare_groups,TotalCharges,TotalCharges,PaymentMethod,PaymentMethod,answer,0.03,True,True,,,True,True,Electronic check,Electronic check,True
+telco-05,telco,How long do customers usually stay?,get_summary,detect_anomalies,tenure,,,,clarification,0.01,False,False,,,False,,,,False
+telco-06,telco,What drives monthly charges?,calculate_correlation,calculate_correlation,MonthlyCharges,MonthlyCharges,,,answer,0.14,True,True,,,True,,,,True
+telco-07,telco,Segment the customers,segment_records,segment_records,,,,,answer,1.24,True,,,,True,,,,True
+telco-08,telco,Generate a customer churn report,generate_report,generate_report,,,,,answer,28.79,True,,,,True,,,,True
+telco-09,telco,Any customers with abnormal total charges?,detect_anomalies,detect_anomalies,TotalCharges,TotalCharges,,,answer,0.59,True,True,,,True,,,,True
+telco-10,telco,Show the distribution of internet service,get_summary,get_summary,InternetService,InternetService,,,answer,0.01,True,True,,,True,,,,True
+telco-11,telco,Average tenure by contract,compare_groups,compare_groups,tenure,tenure,Contract,Contract,answer,0.03,True,True,,,True,True,Two year,Two year,True
+telco-12,telco,Check missing values in the data,assess_data_quality,assess_data_quality,,,,,answer,0.01,True,,,,True,,,,True
+telco-13,telco,Churn by contract and internet service,pivot_table,pivot_table,,Churn,Contract,Contract,answer,0.03,True,True,,,True,,,,True
+telco-14,telco,What would monthly charges be for a fiber optic customer?,predict_value,predict_value,MonthlyCharges,MonthlyCharges,,,answer,12.29,True,True,,,True,,,,True
+telco-15,telco,Is churn increasing month over month?,analyze_trend,analyze_trend,,,,Churn,INSUFFICIENT_DATA,0.01,True,,,True,,,,,True
+telco-16,telco,What is the average customer satisfaction score?,get_summary,get_summary,,customer satisfaction,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+telco-17,telco,Which payment method do most customers use?,compare_groups,compare_groups,,,PaymentMethod,PaymentMethod,answer,0.02,True,True,,,True,True,Electronic check,Electronic check,True
+telco-18,telco,Show the 5 customers with the highest total charges,query_records,query_records,TotalCharges,TotalCharges,,,answer,0.02,True,True,,,True,,,,True
+bank-01,bank,Which job type has the highest subscription rate?,compare_groups,compare_groups,y,y,job,job,answer,0.09,True,True,,,True,True,student,student,True
+bank-02,bank,What is the average call duration?,get_summary,get_summary,duration,duration,,,answer,0.02,True,True,,,True,True,258.2850101971448,258.2850101971448,True
+bank-03,bank,Predict whether a client subscribes,predict_class,predict_class,y,y,,,answer,44.76,True,True,,,True,,,,True
+bank-04,bank,Average number of campaign contacts by month,compare_groups,compare_groups,campaign,campaign,month,month,answer,0.05,True,True,,,True,True,jul,jul,True
+bank-05,bank,How are the columns in this data related?,describe_relationships,describe_relationships,,,,,answer,0.02,True,,,,True,,,,True
+bank-06,bank,Generate a marketing report,generate_report,generate_report,,,,,answer,48.36,True,,,,True,,,,True
+bank-07,bank,Unusual campaign values?,detect_anomalies,detect_anomalies,campaign,campaign,,,answer,1.14,True,True,,,True,,,,True
+bank-08,bank,What is associated with the euribor rate?,calculate_correlation,calculate_correlation,euribor3m,euribor3m,,,answer,0.3,True,True,,,True,,,,True
+bank-09,bank,Distribution of education levels,get_summary,get_summary,education,education,,,answer,0.02,True,True,,,True,,,,True
+bank-10,bank,Segment clients,segment_records,segment_records,,,,,answer,2.76,True,,,,True,,,,True
+bank-11,bank,Subscription by marital status and education,pivot_table,pivot_table,,,marital,marital,answer,0.06,True,True,,,True,,,,True
+bank-12,bank,Average age of clients who were contacted by telephone,get_summary,get_summary,age,age,,,answer,0.03,True,True,True,,True,True,40.12051316139325,40.12051316139325,True
+bank-13,bank,What is the average account balance?,get_summary,get_summary,,account balance,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+bank-14,bank,Write a poem about banking,unsupported,unsupported,,,,,UNSUPPORTED_OPERATION,0.01,True,,,True,,,,,True
+bank-15,bank,Do a data quality check,assess_data_quality,assess_data_quality,,,,,answer,0.01,True,,,,True,,,,True
+company-01,company,Which region has the highest sales?,compare_groups,compare_groups,Sales,Sales,Region,Region,answer,0.02,True,True,,,True,True,North,North,True
+company-02,company,Which product is least profitable?,compare_groups,compare_groups,Profit,Profit,Product,Product,answer,0.02,True,True,,,True,True,Beta,Beta,True
+company-03,company,Is demand increasing?,analyze_trend,analyze_trend,Demand,Demand,,,answer,0.02,True,True,,,True,,,,True
+company-04,company,Forecast demand for the next 30 days,forecast,forecast,Demand,Demand,,,answer,7.63,True,True,,,True,,,,True
+company-05,company,What is the latest inventory level?,get_current_state,get_current_state,Inventory,Inventory,,,answer,0.01,True,True,,,True,,,,True
+company-06,company,What happens to profit if cost rises by 15%?,run_scenario,run_scenario,Profit,Profit,,,answer,5.46,True,True,,,True,,,,True
+company-07,company,Predict risk flag,predict_class,predict_class,Risk_Flag,Risk_Flag,,,answer,7.22,True,True,,,True,,,,True
+company-08,company,Why did sales change last month?,explain_change,explain_change,Sales,Sales,,,answer,0.02,True,True,,,True,,,,True
+company-09,company,Sales by region and product,pivot_table,pivot_table,Sales,Sales,Region,Region,answer,0.03,True,True,,,True,,,,True
+company-10,company,Average customers per product,compare_groups,compare_groups,Customers,Customers,Product,Product,answer,0.02,True,True,,,True,True,Beta,Beta,True
+company-11,company,Total cost in the North region,get_summary,get_summary,Cost,Cost,,,answer,0.02,True,True,True,,True,True,2026634.46,2026634.46,True
+company-12,company,Generate an operations report,generate_report,generate_report,,,,,answer,12.72,True,,,,True,,,,True
+company-13,company,What is the average employee salary?,get_summary,get_summary,,employee salary,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+company-14,company,Find anomalies in profit,detect_anomalies,detect_anomalies,Profit,Profit,,,answer,0.29,True,True,,,True,,,,True
+hospital-01,hospital,Which department has the longest waiting time?,compare_groups,compare_groups,Waiting_Time,Waiting_Time,Department,Department,answer,0.02,True,True,,,True,True,Cardiology,Cardiology,True
+hospital-02,hospital,What is the average number of patients?,get_summary,get_summary,Patients,Patients,,,answer,0.01,True,True,,,True,True,113.256,113.256,True
+hospital-03,hospital,Is waiting time getting worse?,analyze_trend,analyze_trend,Waiting_Time,Waiting_Time,,,answer,0.02,True,True,,,True,,,,True
+hospital-04,hospital,Forecast patients for the next two weeks,forecast,forecast,Patients,Patients,,,answer,3.38,True,True,,,True,,,,True
+hospital-05,hospital,What is the current bed occupancy?,get_current_state,get_current_state,Beds_Occupied,,,,answer,0.01,True,False,,,True,,,,False
+hospital-06,hospital,Predict capacity risk,predict_class,predict_class,Capacity_Risk,Capacity_Risk,,,answer,7.24,True,True,,,True,,,,True
+hospital-07,hospital,What is related to waiting time?,calculate_correlation,calculate_correlation,Waiting_Time,Waiting_Time,,,answer,0.02,True,True,,,True,,,,True
+hospital-08,hospital,"What if staff count increased by 20%, how would waiting time change?",run_scenario,run_scenario,Waiting_Time,Waiting_Time,,,answer,4.45,True,True,,,True,,,,True
+hospital-09,hospital,Any unusual patient numbers?,detect_anomalies,detect_anomalies,Patients,Patients,,,answer,0.31,True,True,,,True,,,,True
+hospital-10,hospital,Total patients by department,compare_groups,compare_groups,Patients,Patients,Department,Department,answer,0.02,True,True,,,True,True,Orthopedics,Orthopedics,True
+hospital-11,hospital,How many doctors are on duty?,get_summary,get_summary,,,,,answer,0.01,True,,,False,,,,,False
+hospital-12,hospital,Explore the data,run_eda,run_eda,,,,,answer,0.04,True,,,,True,,,,True

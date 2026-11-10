@@ -11,4 +11,8 @@ xlrd==2.0.2
 pydantic==2.11.9
 python-dotenv==1.1.1
 google-genai==1.40.0
+statsmodels==0.14.5
+matplotlib==3.10.7
+reportlab==4.4.4
+waitress==3.0.2
 pytest==9.1.1

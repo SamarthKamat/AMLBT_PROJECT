@@ -59,7 +59,7 @@ def make_result(operation: str, summary: str, **kw) -> Dict[str, Any]:
         "success": True, "operation": operation, "title": kw.pop("title", None), "summary": summary,
         "metrics": {}, "table": [], "table_title": None, "tables": {}, "charts": [],
         "evaluation": None, "explainability": None, "forecast": None, "scenario": None, "prediction": None,
-        "limitations": [], "assumptions": [], "warnings": [], "provenance": {},
+        "limitations": [], "assumptions": [], "warnings": [], "provenance": {}, "insights": [],
     }
     res.update(kw)
     return res

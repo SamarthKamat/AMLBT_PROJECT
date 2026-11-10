@@ -1,0 +1,104 @@
+{"id": "superstore-01", "dataset": "superstore", "q": "Which country generated the most sales?", "op": "compare_groups", "target": "Sales", "group": ["Country"], "agg": "sum", "filters": null, "error": null}
+{"id": "superstore-02", "dataset": "superstore", "q": "Which market has the lowest total profit?", "op": "compare_groups", "target": "Profit", "group": ["Market"], "agg": "sum", "filters": null, "error": null}
+{"id": "superstore-03", "dataset": "superstore", "q": "What's the average discount we give?", "op": "get_summary", "target": "Discount", "group": null, "agg": "mean", "filters": null, "error": null}
+{"id": "superstore-04", "dataset": "superstore", "q": "How much profit did we make in total?", "op": "get_summary", "target": "Profit", "group": null, "agg": "sum", "filters": null, "error": null}
+{"id": "superstore-05", "dataset": "superstore", "q": "Rank the product categories by sales", "op": "compare_groups", "target": "Sales", "group": ["Category"], "agg": null, "filters": null, "error": null}
+{"id": "superstore-06", "dataset": "superstore", "q": "Which sub-category earns the highest profit?", "op": "compare_groups", "target": "Profit", "group": ["Sub-Category"], "agg": "sum", "filters": null, "error": null}
+{"id": "superstore-07", "dataset": "superstore", "q": "Average shipping cost per ship mode", "op": "compare_groups", "target": "Shipping Cost", "group": ["Ship Mode"], "agg": "mean", "filters": null, "error": null}
+{"id": "superstore-08", "dataset": "superstore", "q": "Is profit trending up over time?", "op": "analyze_trend", "target": "Profit", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-09", "dataset": "superstore", "q": "Predict sales for the next 6 months", "op": "forecast", "target": "Sales", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-10", "dataset": "superstore", "q": "Any unusual sales amounts?", "op": "detect_anomalies", "target": "Sales", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-11", "dataset": "superstore", "q": "What is correlated with profit?", "op": "calculate_correlation", "target": "Profit", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-12", "dataset": "superstore", "q": "Show me the 10 biggest orders by sales", "op": "query_records", "target": "Sales", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-13", "dataset": "superstore", "q": "List the orders from India with the lowest profit", "op": "query_records", "target": "Profit", "group": null, "agg": null, "filters": [["Country", "India"]], "error": null}
+{"id": "superstore-14", "dataset": "superstore", "q": "Total sales by market and category", "op": "pivot_table", "target": "Sales", "group": ["Market"], "agg": null, "filters": null, "error": null}
+{"id": "superstore-15", "dataset": "superstore", "q": "Why did profit fall last quarter?", "op": "explain_change", "target": "Profit", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-16", "dataset": "superstore", "q": "Cluster the orders into groups", "op": "segment_records", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-17", "dataset": "superstore", "q": "Create a sales report for management", "op": "generate_report", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-18", "dataset": "superstore", "q": "How clean is this dataset?", "op": "assess_data_quality", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-19", "dataset": "superstore", "q": "Explain how the columns relate to each other", "op": "describe_relationships", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-20", "dataset": "superstore", "q": "What if the discount went up by 10 percent - what happens to profit?", "op": "run_scenario", "target": "Profit", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-21", "dataset": "superstore", "q": "Breakdown of orders by order priority", "op": "get_summary", "target": "Order Priority", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "superstore-22", "dataset": "superstore", "q": "What's the average customer rating?", "op": "get_summary", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "superstore-23", "dataset": "superstore", "q": "Forecast the number of returns next month", "op": "forecast", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "superstore-24", "dataset": "superstore", "q": "Book a meeting with the regional manager", "op": "unsupported", "target": null, "group": null, "agg": null, "filters": null, "error": "UNSUPPORTED_OPERATION"}
+{"id": "superstore-25", "dataset": "superstore", "q": "Profit by segment for the Europe market", "op": "compare_groups", "target": "Profit", "group": ["Segment"], "agg": null, "filters": [["Market", "Europe"]], "error": null}
+{"id": "hr-01", "dataset": "hr", "q": "Which department has the highest attrition rate?", "op": "compare_groups", "target": "Attrition", "group": ["Department"], "agg": null, "filters": null, "error": null}
+{"id": "hr-02", "dataset": "hr", "q": "What is the average monthly income?", "op": "get_summary", "target": "MonthlyIncome", "group": null, "agg": "mean", "filters": null, "error": null}
+{"id": "hr-03", "dataset": "hr", "q": "Average monthly income by job role", "op": "compare_groups", "target": "MonthlyIncome", "group": ["JobRole"], "agg": "mean", "filters": null, "error": null}
+{"id": "hr-04", "dataset": "hr", "q": "What factors predict attrition?", "op": "predict_class", "target": "Attrition", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-05", "dataset": "hr", "q": "Will an employee who works overtime leave the company?", "op": "predict_class", "target": "Attrition", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-06", "dataset": "hr", "q": "How many employees are there?", "op": "get_summary", "target": null, "group": null, "agg": "count", "filters": null, "error": null}
+{"id": "hr-07", "dataset": "hr", "q": "Show the gender split", "op": "get_summary", "target": "Gender", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-08", "dataset": "hr", "q": "Which education field has the lowest job satisfaction?", "op": "compare_groups", "target": "JobSatisfaction", "group": ["EducationField"], "agg": "mean", "filters": null, "error": null}
+{"id": "hr-09", "dataset": "hr", "q": "Are there outliers in monthly income?", "op": "detect_anomalies", "target": "MonthlyIncome", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-10", "dataset": "hr", "q": "What is related to years at company?", "op": "calculate_correlation", "target": "YearsAtCompany", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-11", "dataset": "hr", "q": "Estimate monthly income for someone with 10 total working years", "op": "predict_value", "target": "MonthlyIncome", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-12", "dataset": "hr", "q": "Prepare an HR report", "op": "generate_report", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-13", "dataset": "hr", "q": "Group employees into segments", "op": "segment_records", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-14", "dataset": "hr", "q": "Do an exploratory analysis of the data", "op": "run_eda", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hr-15", "dataset": "hr", "q": "Median age of employees", "op": "get_summary", "target": "Age", "group": null, "agg": "median", "filters": null, "error": null}
+{"id": "hr-16", "dataset": "hr", "q": "List employees in Research & Development with monthly income above 15000", "op": "query_records", "target": null, "group": null, "agg": null, "filters": [["Department", "Research & Development"]], "error": null}
+{"id": "hr-17", "dataset": "hr", "q": "Attrition by department and overtime", "op": "pivot_table", "target": null, "group": ["Department"], "agg": null, "filters": null, "error": null}
+{"id": "hr-18", "dataset": "hr", "q": "What is the average bonus paid?", "op": "get_summary", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "hr-19", "dataset": "hr", "q": "Forecast monthly income for next year", "op": "forecast", "target": null, "group": null, "agg": null, "filters": null, "error": "INSUFFICIENT_DATA"}
+{"id": "hr-20", "dataset": "hr", "q": "Which job role has the most employees?", "op": "compare_groups", "target": null, "group": ["JobRole"], "agg": null, "filters": null, "error": null}
+{"id": "telco-01", "dataset": "telco", "q": "Which contract type has the highest churn rate?", "op": "compare_groups", "target": "Churn", "group": ["Contract"], "agg": null, "filters": null, "error": null}
+{"id": "telco-02", "dataset": "telco", "q": "What is the average monthly charge?", "op": "get_summary", "target": "MonthlyCharges", "group": null, "agg": "mean", "filters": null, "error": null}
+{"id": "telco-03", "dataset": "telco", "q": "Predict which customers will churn", "op": "predict_class", "target": "Churn", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-04", "dataset": "telco", "q": "Total charges by payment method", "op": "compare_groups", "target": "TotalCharges", "group": ["PaymentMethod"], "agg": "sum", "filters": null, "error": null}
+{"id": "telco-05", "dataset": "telco", "q": "How long do customers usually stay?", "op": "get_summary", "target": "tenure", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-06", "dataset": "telco", "q": "What drives monthly charges?", "op": "calculate_correlation", "target": "MonthlyCharges", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-07", "dataset": "telco", "q": "Segment the customers", "op": "segment_records", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-08", "dataset": "telco", "q": "Generate a customer churn report", "op": "generate_report", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-09", "dataset": "telco", "q": "Any customers with abnormal total charges?", "op": "detect_anomalies", "target": "TotalCharges", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-10", "dataset": "telco", "q": "Show the distribution of internet service", "op": "get_summary", "target": "InternetService", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-11", "dataset": "telco", "q": "Average tenure by contract", "op": "compare_groups", "target": "tenure", "group": ["Contract"], "agg": "mean", "filters": null, "error": null}
+{"id": "telco-12", "dataset": "telco", "q": "Check missing values in the data", "op": "assess_data_quality", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-13", "dataset": "telco", "q": "Churn by contract and internet service", "op": "pivot_table", "target": null, "group": ["Contract"], "agg": null, "filters": null, "error": null}
+{"id": "telco-14", "dataset": "telco", "q": "What would monthly charges be for a fiber optic customer?", "op": "predict_value", "target": "MonthlyCharges", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "telco-15", "dataset": "telco", "q": "Is churn increasing month over month?", "op": "analyze_trend", "target": null, "group": null, "agg": null, "filters": null, "error": "INSUFFICIENT_DATA"}
+{"id": "telco-16", "dataset": "telco", "q": "What is the average customer satisfaction score?", "op": "get_summary", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "telco-17", "dataset": "telco", "q": "Which payment method do most customers use?", "op": "compare_groups", "target": null, "group": ["PaymentMethod"], "agg": null, "filters": null, "error": null}
+{"id": "telco-18", "dataset": "telco", "q": "Show the 5 customers with the highest total charges", "op": "query_records", "target": "TotalCharges", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-01", "dataset": "bank", "q": "Which job type has the highest subscription rate?", "op": "compare_groups", "target": "y", "group": ["job"], "agg": null, "filters": null, "error": null}
+{"id": "bank-02", "dataset": "bank", "q": "What is the average call duration?", "op": "get_summary", "target": "duration", "group": null, "agg": "mean", "filters": null, "error": null}
+{"id": "bank-03", "dataset": "bank", "q": "Predict whether a client subscribes", "op": "predict_class", "target": "y", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-04", "dataset": "bank", "q": "Average number of campaign contacts by month", "op": "compare_groups", "target": "campaign", "group": ["month"], "agg": "mean", "filters": null, "error": null}
+{"id": "bank-05", "dataset": "bank", "q": "How are the columns in this data related?", "op": "describe_relationships", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-06", "dataset": "bank", "q": "Generate a marketing report", "op": "generate_report", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-07", "dataset": "bank", "q": "Unusual campaign values?", "op": "detect_anomalies", "target": "campaign", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-08", "dataset": "bank", "q": "What is associated with the euribor rate?", "op": "calculate_correlation", "target": "euribor3m", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-09", "dataset": "bank", "q": "Distribution of education levels", "op": "get_summary", "target": "education", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-10", "dataset": "bank", "q": "Segment clients", "op": "segment_records", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "bank-11", "dataset": "bank", "q": "Subscription by marital status and education", "op": "pivot_table", "target": null, "group": ["marital"], "agg": null, "filters": null, "error": null}
+{"id": "bank-12", "dataset": "bank", "q": "Average age of clients who were contacted by telephone", "op": "get_summary", "target": "age", "group": null, "agg": "mean", "filters": [["contact", "telephone"]], "error": null}
+{"id": "bank-13", "dataset": "bank", "q": "What is the average account balance?", "op": "get_summary", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "bank-14", "dataset": "bank", "q": "Write a poem about banking", "op": "unsupported", "target": null, "group": null, "agg": null, "filters": null, "error": "UNSUPPORTED_OPERATION"}
+{"id": "bank-15", "dataset": "bank", "q": "Do a data quality check", "op": "assess_data_quality", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-01", "dataset": "company", "q": "Which region has the highest sales?", "op": "compare_groups", "target": "Sales", "group": ["Region"], "agg": "sum", "filters": null, "error": null}
+{"id": "company-02", "dataset": "company", "q": "Which product is least profitable?", "op": "compare_groups", "target": "Profit", "group": ["Product"], "agg": "sum", "filters": null, "error": null}
+{"id": "company-03", "dataset": "company", "q": "Is demand increasing?", "op": "analyze_trend", "target": "Demand", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-04", "dataset": "company", "q": "Forecast demand for the next 30 days", "op": "forecast", "target": "Demand", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-05", "dataset": "company", "q": "What is the latest inventory level?", "op": "get_current_state", "target": "Inventory", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-06", "dataset": "company", "q": "What happens to profit if cost rises by 15%?", "op": "run_scenario", "target": "Profit", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-07", "dataset": "company", "q": "Predict risk flag", "op": "predict_class", "target": "Risk_Flag", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-08", "dataset": "company", "q": "Why did sales change last month?", "op": "explain_change", "target": "Sales", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-09", "dataset": "company", "q": "Sales by region and product", "op": "pivot_table", "target": "Sales", "group": ["Region"], "agg": null, "filters": null, "error": null}
+{"id": "company-10", "dataset": "company", "q": "Average customers per product", "op": "compare_groups", "target": "Customers", "group": ["Product"], "agg": "mean", "filters": null, "error": null}
+{"id": "company-11", "dataset": "company", "q": "Total cost in the North region", "op": "get_summary", "target": "Cost", "group": null, "agg": "sum", "filters": [["Region", "North"]], "error": null}
+{"id": "company-12", "dataset": "company", "q": "Generate an operations report", "op": "generate_report", "target": null, "group": null, "agg": null, "filters": null, "error": null}
+{"id": "company-13", "dataset": "company", "q": "What is the average employee salary?", "op": "get_summary", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "company-14", "dataset": "company", "q": "Find anomalies in profit", "op": "detect_anomalies", "target": "Profit", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-01", "dataset": "hospital", "q": "Which department has the longest waiting time?", "op": "compare_groups", "target": "Waiting_Time", "group": ["Department"], "agg": "mean", "filters": null, "error": null}
+{"id": "hospital-02", "dataset": "hospital", "q": "What is the average number of patients?", "op": "get_summary", "target": "Patients", "group": null, "agg": "mean", "filters": null, "error": null}
+{"id": "hospital-03", "dataset": "hospital", "q": "Is waiting time getting worse?", "op": "analyze_trend", "target": "Waiting_Time", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-04", "dataset": "hospital", "q": "Forecast patients for the next two weeks", "op": "forecast", "target": "Patients", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-05", "dataset": "hospital", "q": "What is the current bed occupancy?", "op": "get_current_state", "target": "Beds_Occupied", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-06", "dataset": "hospital", "q": "Predict capacity risk", "op": "predict_class", "target": "Capacity_Risk", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-07", "dataset": "hospital", "q": "What is related to waiting time?", "op": "calculate_correlation", "target": "Waiting_Time", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-08", "dataset": "hospital", "q": "What if staff count increased by 20%, how would waiting time change?", "op": "run_scenario", "target": "Waiting_Time", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-09", "dataset": "hospital", "q": "Any unusual patient numbers?", "op": "detect_anomalies", "target": "Patients", "group": null, "agg": null, "filters": null, "error": null}
+{"id": "hospital-10", "dataset": "hospital", "q": "Total patients by department", "op": "compare_groups", "target": "Patients", "group": ["Department"], "agg": "sum", "filters": null, "error": null}
+{"id": "hospital-11", "dataset": "hospital", "q": "How many doctors are on duty?", "op": "get_summary", "target": null, "group": null, "agg": null, "filters": null, "error": "INVALID_COLUMN"}
+{"id": "hospital-12", "dataset": "hospital", "q": "Explore the data", "op": "run_eda", "target": null, "group": null, "agg": null, "filters": null, "error": null}

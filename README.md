@@ -1,135 +1,110 @@
-# Universal Dataset Intelligence (UDI)
+# UDI 2.0 — Universal Dataset Intelligence
+### An AI-powered autonomous data analyst and business decision-intelligence platform
 
-UDI is a conversational analytics and machine-learning assistant for tabular data (CSV / XLSX / XLS). You select a domain for context, upload a dataset and ask questions in plain language. Each question can lead to a different analysis: a plain aggregation, a group comparison, a trend test, anomaly detection, a correlation analysis, a regression or classification model trained on your data, a forecast, or a what-if scenario.
+Upload a CSV / Excel file (or load one of the bundled public datasets) and ask questions in plain language:
 
-**Stack:** React (Vite) frontend · Flask / Python backend · pandas, scikit-learn, XGBoost, SciPy for all computation · Google Gemini only for language (planning and wording). No Streamlit.
+> *Which country has the highest sales?* · *Why did profit drop last quarter?* · *What predicts attrition?* · *Are there outliers in shipping cost?* · *Total sales by market and category* · *Forecast demand for the next 6 months* · *Generate an HR report*
 
-## 1. Roles: who does what
+UDI plans each question, **validates the plan against the real columns**, runs one **controlled Python operation**, explains models with **SHAP**, turns verified numbers into **business findings and suggested actions**, and shows every answer with charts you can switch (bar / pie / line / table) and export.
 
-| Layer | Responsibility | Never does |
+**Stack:** React 18 + Vite + Recharts · Flask / Python · pandas, scikit-learn, XGBoost, statsmodels, SciPy · ReportLab + Matplotlib (PDF) + openpyxl (Excel) · SQLite persistence · Google Gemini *(optional)* or the built-in **local intent model** for planning.
+
+---
+
+## 1. What UDI 2.0 does
+
+| Capability | Where | How |
 |---|---|---|
-| **Gemini** | Understands the question, resolves follow-ups, returns a *structured plan* (JSON). Words the explanation of a result that Python already verified. | Compute numbers, invent columns/targets/groups/dates/metrics, write or run code, answer from its own knowledge. |
-| **Validator** (Python) | Checks the plan against the real dataset: columns exist, types fit the operation, filters match real values, enough data. | Silently substitute a column. A missing column is rejected with the list of available ones. |
-| **Operations** (Python) | Compute everything: statistics, models, metrics, forecasts, charts. | Execute anything Gemini wrote. Only the ten operations below exist. |
-| **React UI** | Shows operation, target, model, metrics, charts, tables, limitations, errors, Gemini/backend status. | |
+| **Answer any question on the data** | *Ask* tab | 18 controlled operations (table below), chosen by a planner, verified by a validation gate. |
+| **Column-wise relationships** | *Relationships* tab, "how are the columns related?" | Mixed-type association matrix (Pearson/Spearman, correlation ratio η, bias-corrected Cramér's V), hierarchies (City → State → Country), derived formulas (Profit = Sales − Cost), date rules, keys, data dictionary with semantic types. |
+| **Outlier detection** | "any outliers in X?" | IQR fences + z-score + Isolation Forest (≥ 2 of 3 agree), or multivariate Isolation Forest with per-record drivers. |
+| **EDA** | *EDA* tab, "perform EDA" | Distributions, skew, box plots, category mixes, missingness, association heatmap, KPI over time, auto-written insights; or a focused deep dive on one column. |
+| **Data quality + cleaning** | *Data quality* tab | 0–100 score over five dimensions, issues with recommended treatments, selectable auto-cleaning, before/after comparison, revert, download. |
+| **Business reports** (sales, marketing, HR, operations, finance, customer, general) | *Reports* tab, "generate an HR report" | Multi-agent pipeline → KPIs, segment comparisons, margins, trend, root cause, driver model + SHAP, segments, anomalies, forecast, findings with evidence and illustrative impact; **PDF / Excel / JSON** export. |
+| **Visualisations** | every answer | bar, grouped/stacked bar, line, area, pie, scatter, forecast bands (80/95%), heatmap, box plot, waterfall (SHAP and root cause); switch view, CSV export. |
+| **Predictions & what-if** | "predict X", "what if Y rises 10%?" | AutoML: 5 candidates, CV mean ± std, one-standard-error selection, tuning, learning curve, time-ordered validation, leakage screening, SHAP global + per-prediction waterfall. |
+| **Forecasting** | "forecast X for the next 6 months" | Naive / seasonal naive / moving average / trend+season / ridge-AR / RF / GBM / Holt-Winters ETS / ARIMA-SARIMA, rolling-origin backtest, horizon-dependent 80 % and 95 % ranges, skill vs baseline. |
+| **Root cause** | "why did profit fall?" | Exact decomposition of the change across groups (mix vs rate effects for averages), waterfall chart, most concentrated dimension. |
+| **Segmentation** | "segment the customers" | K-means, k chosen by silhouette, readable segment profiles, PCA map. |
 
-Gemini is required for planning. There is **no keyword or rule-based fallback** and no mock mode: if Gemini is unavailable, the question fails with a structured `GEMINI_*` error and nothing is guessed. If only the *explanation* step fails (or Gemini's wording contains a number that is not in the verified result), the answer falls back to a Python-written summary of the same verified result, and the UI says so.
+### The 18 operations
+`get_summary` · `get_current_state` · `compare_groups` · `analyze_trend` · `detect_anomalies` · `calculate_correlation` · `predict_value` · `predict_class` · `forecast` · `run_scenario` (Phase 1) and `query_records` · `pivot_table` · `run_eda` · `assess_data_quality` · `describe_relationships` · `explain_change` · `segment_records` · `generate_report` (Phase 2). Nothing outside this list can run: the planner chooses a name, Python executes it. There is no `exec`/`eval` (a test scans the source).
+
+## 2. Architecture (who does what)
 
 ```text
-question ─► Gemini plan (JSON) ─► validate against data ─► Python operation ─► verified result ─► wording (Gemini, checked) ─► UI
-              schema + stats       INVALID_COLUMN,          pandas / sklearn       numbers,           every number must
-              + last 4 turns       INSUFFICIENT_DATA…                              charts, tables     trace to the result
+question ─► Planner agent ─► Validation gate ─► Analyst / ML agent ─► Business Analyst agent ─► Narrator ─► UI
+            Gemini (if set)    columns exist?      one of 18 Python      findings + actions       Gemini wording only if
+            or local intent    types fit? filters   operations           from verified numbers    every number is in the
+            model (offline)    real? enough data?   (pandas/sklearn…)                              verified result
 ```
+* **Planner.** `UDI_PLANNER=auto` (default) uses Gemini when a key is configured and the **local intent model** otherwise (or when a Gemini call fails); `gemini` = Gemini only (Phase 1 behaviour); `local` = fully offline. The local planner links words to columns and category values, masks them (`which catcol has the highest numcol`), classifies the intent with TF-IDF + logistic regression (19 classes, trained on a templated corpus in `planner_corpus.py`) and fills slots deterministically. Low confidence → clarification.
+* **Validation gate.** An unknown column is **rejected with the list of available columns, never substituted**; filters must match real values; each operation has data-sufficiency checks.
+* **Agents** (`agents.py`). Data Analyst (quality, relationships) · Business Analyst (KPIs, segments, margins, trends, root cause) · ML agent (drivers + SHAP, segments, anomalies, forecast) · Report agent. Agents only call validated tools; every call is logged in an **agent trace** shown in the UI and the PDF.
 
-### What is sent to Gemini
-Domain name and a short context sentence; dataset name; row count; per-column name, detected role, type, missing %, unique count, summary statistics and, for categorical columns, the distinct category values (capped for high-cardinality columns); up to `GEMINI_SAMPLE_ROWS` sample rows (default 3; set 0 to send no row values); the question; the last four turns (question, executed plan, short digest of the verified result). **The dataset itself is never sent.** For the wording step Gemini receives only the verified result digest.
+Details: `docs/ARCHITECTURE.md`.
 
-## 2. Domains (context, not model locks)
-Company · Hospital · College · Municipality · NGO · Community · Event Organizer.
-The domain tells Gemini which vocabulary the user probably uses. It does not choose a target or a model; the dataset schema and the question decide that. The same engine serves every domain, and the plan is validated against the uploaded columns, not against the domain.
+## 3. Install and run
 
-## 3. Operations (the complete controlled library)
-| Operation | Typical question | Method |
-|---|---|---|
-| `get_summary` | "Give me an overview", "average X", "how many…" | Deterministic pandas aggregations and distributions. No ML. |
-| `get_current_state` | "What is the latest X?" | Most recent observation versus the previous one. No ML. |
-| `compare_groups` | "Compare X across Y", "which Y is highest?" | Group aggregation + Kruskal–Wallis / chi-square test. No ML. |
-| `analyze_trend` | "Is X rising?" | Period aggregation, Mann–Kendall test, linear fit. No ML. |
-| `detect_anomalies` | "Which records look unusual?" | IQR fences, z-score, Isolation Forest (flag needs ≥2 of 3 agreeing by default). Flags are *unusual*, not *wrong*. |
-| `calculate_correlation` | "What is related to X?" | Pearson/Spearman (numeric), η (numeric vs category), Cramér's V (category vs category). Reports that correlation is not causation. |
-| `predict_value` | "Predict X for …" | Trains and compares regression models on your data (below). |
-| `predict_class` | "Will … be late/high-risk?" | Trains and compares classification models on your data. |
-| `forecast` | "Forecast X for the next 14 days" | Time-aware candidates + rolling-origin backtest. |
-| `run_scenario` | "What if distance grows 20%?" | Re-scores the dataset with the trained regression model; labelled model-based and non-causal. |
+Prerequisites: **Python 3.11+**, **Node.js 18+**.
 
-Not every question needs ML: averages, group comparisons and unusual-value checks are computed directly.
+**Windows:** double-click `run_windows.bat`. **macOS / Linux:** `./run_unix.sh`. Both create `backend/.venv`, install packages, create `backend/.env`, train the local planner, build the frontend and start the server. Open **http://localhost:5000**.
 
-## 4. Dynamic model selection (uploaded data)
-For `predict_value`, `predict_class`, `run_scenario` and `forecast` UDI works out the task from the plan and the data, then:
-1. **Preprocesses**: drops duplicates, excludes identifier-like columns (name + uniqueness, or sequential index), constant/empty columns and date columns from tabular features, imputes missing values, one-hot encodes categories, scales numerics. High-cardinality *numeric* business variables (Sales, Revenue…) are kept.
-2. **Trains candidates** — regression: Linear, Decision Tree, Random Forest, Gradient Boosting, XGBoost; classification: Logistic, Decision Tree, Random Forest, Gradient Boosting, XGBoost.
-3. **Selects** by cross-validation on the training split (regression: RMSE; classification: macro-F1), then reports **honest hold-out metrics** (regression MAE / RMSE / R²; classification accuracy / precision / recall / F1 / ROC-AUC, confusion matrix, per-class table, majority-class or mean baseline) and refits the winner on all labelled rows.
-4. **Explains** with permutation importance on held-out rows (SHAP is not implemented).
-5. **Caches** the trained model per session (key: dataset, task, target, features, filters, config version), so a follow-up prediction or scenario reuses it. A new upload or "New chat" clears the cache.
-6. **Warns** about leakage-like features (near-perfect correlation with the target), weak models (low R²), extrapolation outside the training range, and thin classes.
-
-**Forecasting** needs a time column, a numeric target and at least 24 periods (horizon ≤ one third of history). Candidates: naive, seasonal naive, moving average, linear trend (+ seasonal profile), ridge autoregression, Random-Forest and Gradient-Boosting lag models. They are compared with a **time-ordered rolling-origin backtest** (data is never shuffled); naive baselines are always included and the report says whether the chosen model beats them. The 80% band is approximate (backtest error).
-
-**Data-sufficiency checks** (otherwise `INSUFFICIENT_DATA` with the reason): regression ≥ 30 labelled rows; classification ≥ 40 rows, 2–30 classes, ≥ 5 rows per class; anomalies ≥ 20 values; trend ≥ 6 periods; forecast ≥ 24 periods.
-
-## 5. Dataset requirements
-- CSV (delimiter and encoding detected), XLSX, XLS (`.xls` loading relies on `xlrd` and is untested here); first non-empty sheet; header row detected automatically.
-- One table, one row per record. Numeric text such as `₹1,200` and common date formats are converted.
-- A date/time column is needed only for trend, current-state, forecast and date-range filters.
-- Maximum upload size: `UDI_MAX_UPLOAD_MB` (default 50).
-
-## 6. Install and run (Windows)
-Prerequisites: Python 3.10+ and Node.js 18+ on PATH.
-1. Unzip the project.
-2. Double-click `run_windows.bat` (or run it from a terminal). It creates `backend\.venv`, installs requirements, creates `backend\.env` from `.env.example`, installs and builds the frontend, and starts Flask. It stops at the first error and shows it.
-3. First run: when it reports `[ACTION NEEDED]`, open `backend\.env`, set your own `GEMINI_API_KEY` and `GEMINI_MODEL`, save, and run the script again.
-4. Open http://localhost:5000.
+Gemini is optional. To use it, put `GEMINI_API_KEY` and `GEMINI_MODEL` in `backend/.env`; without them UDI plans with its local model (shown in the header chip).
 
 Manual equivalent:
-```bat
+```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-copy .env.example .env      & rem then edit .env
-cd ..\frontend
-npm install
-npm run build
-cd ..\backend
-python app.py
+.venv/bin/pip install -r requirements.txt        # Windows: .venv\Scripts\pip
+cp .env.example .env                              # optional: add GEMINI_API_KEY / GEMINI_MODEL
+.venv/bin/python train_planner.py
+cd ../frontend && npm install && npm run build
+cd ../backend && .venv/bin/python serve.py        # http://localhost:5000
 ```
-macOS/Linux: `./run_unix.sh`.
+**Docker:** `docker compose up --build` → http://localhost:5000 (data persisted in the `udi-data` volume).
+**Development:** `python app.py` in `backend` and `npm run dev` in `frontend` (http://localhost:5173, `/api` proxied).
 
-**Frontend development:** run Flask (`python app.py`) and, in `frontend`, `npm run dev` → http://localhost:5173 (Vite proxies `/api` to port 5000).
-
-## 7. Environment variables (`backend/.env`)
+## 4. Configuration (`backend/.env`)
 | Variable | Meaning |
 |---|---|
-| `GEMINI_API_KEY` | Your key. Required for planning. Never commit it. |
-| `GEMINI_MODEL` | Model name your key can call. **No default**: an unavailable or retired model is reported (`GEMINI_MODEL_UNAVAILABLE`) together with the models your key can use, never silently replaced. |
-| `GEMINI_TIMEOUT_SECONDS` | Per-request timeout (default 60). |
-| `GEMINI_SAMPLE_ROWS` | Sample rows sent for planning (default 3, 0 = none). |
-| `FLASK_PORT` | Backend port (default 5000). |
-| `UDI_MAX_UPLOAD_MB`, `UDI_SESSION_TTL_SECONDS`, `UDI_MAX_SESSIONS` | Upload limit, session lifetime, session cap. |
+| `UDI_PLANNER` | `auto` (default) · `gemini` · `local` |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Optional Gemini planning / wording. No default model is hard-coded. |
+| `UDI_AUTH` | `on` = users register / sign in (PBKDF2 passwords, hashed bearer tokens, first user is admin); sessions are private to their owner. Default `off` (single local user). |
+| `UDI_PERSIST_SESSIONS`, `UDI_DATA_DIR` | Datasets and conversations are stored (SQLite + snapshots) and restored after a restart. |
+| `UDI_SESSION_TTL_SECONDS` | Inactive sessions — including stored files — are deleted after this time (default 6 h). |
+| `UDI_RATE_CHAT`, `UDI_RATE_UPLOAD`, `UDI_RATE_REPORT` | Requests per minute per user. |
+| `UDI_MAX_UPLOAD_MB`, `FLASK_PORT`, `UDI_CORS_ORIGINS` | Upload limit, port, CORS. |
 
-The status chip in the header shows Gemini state; click it to run a live check of the key and model.
+## 5. Bundled datasets
+* **Real, public** (`backend/sample_data/real/`): Global Superstore 1,000-order extract (sales/operations/finance), IBM HR Analytics Employee Attrition (HR), IBM Telco Customer Churn (marketing/customer), UCI Bank Marketing *bank-additional-full* (marketing). Sources in `backend/sample_data/real/SOURCES.md`.
+* **Generated reference data** (`backend/sample_data/*.csv`): seven 900-row domain datasets from `generate_samples.py` (seed 42). They are synthetic and are reported separately from the real datasets.
 
-## 8. Tests and checks
-```bat
+## 6. Tests and evaluation
+```bash
 cd backend
-python -m py_compile app.py config.py errors.py schemas.py data_profiler.py filtering.py preprocessing.py context.py result_formatter.py validator.py analytics_engine.py diagnostics_engine.py anomaly_engine.py ml_engine.py forecasting_engine.py executor.py session_manager.py explainer.py gemini_client.py planner.py reference_models.py train_models.py
-python -m pytest -q
-python reference_models.py --validate        & rem optional: reference models reproduce their stored metrics
-cd ..\frontend
-npm run build
+python -m pytest -q                                    # 168 tests (offline; Gemini replaced by a test double)
+cd ..
+python evaluation/run_benchmark.py --planner local     # held-out NL benchmark, 104 questions, 6 datasets
+python evaluation/run_benchmark.py --planner gemini    # same benchmark with Gemini (needs a key)
+python evaluation/run_real_datasets.py                 # real datasets, robustness, forecasting, reference domains
 ```
-The automated tests run offline. Gemini is replaced by `tests/fake_llm.py::ScriptedLLM`, a test double that returns the plan a correct Gemini would return for a scripted question; the SDK is replaced by a fake client in `tests/test_gemini_client.py`. They cover CSV/Excel loading, profiling, validation (invalid columns, insufficient data), every operation, dynamic model selection and caching, forecasting backtests, scenarios, follow-ups, clarification, new chat, error codes, strict-JSON responses, and that different questions on the same dataset produce different operations. **Live Gemini behaviour (plan quality for your phrasing) is not covered by automated tests.**
+Executed results, pass/fail logs and figures are in `evaluation/results/`; the executed test log is `TEST_REPORT.md`.
 
-`GET /api/session/<id>/routing` returns the per-question log (question → operation, target, model, ML or not) for the session.
+## 7. API (selection)
+`POST /api/upload` · `POST /api/samples/load` · `POST /api/chat` · `GET /api/session/<id>/dictionary` · `GET …/eda` · `GET …/quality` · `POST …/clean` · `POST …/revert` · `GET …/download` · `POST …/report` → `GET /api/jobs/<id>` → `GET /api/jobs/<id>/download?format=pdf|xlsx|json` · `GET …/history` · `DELETE /api/session/<id>` · `POST /api/auth/register|login|logout` · `GET /api/metrics` (admin) · `GET /api/health`.
+Errors are structured `{code, error, retryable}`: `INVALID_COLUMN`, `INSUFFICIENT_DATA`, `UNSUPPORTED_OPERATION`, `INVALID_PLAN`, `GEMINI_*`, `RATE_LIMITED`, `UNAUTHORIZED`, `FORBIDDEN`, …
 
-## 9. Sample data and reference models
-`backend/sample_data/*.csv` are seven demo datasets (one per domain), for testing only. `backend/models/<domain>/` holds reference models trained on them (`MODEL_REPORT.md`). The ZIP ships the four core artifacts per domain (selected regression model, selected classification model, forecasting model, anomaly model); the 56 non-selected candidate models (14.5 MB, only for completeness) come in the optional `UDI_reference_candidates.zip` - unzip it into the project root to restore the full set, or rebuild everything with `run_windows.bat --retrain-reference`. `metadata.json` records the metrics of all candidates either way. **They are not loaded when you ask questions.** They are used for validation (`python reference_models.py --validate` re-scores them and compares with stored metrics) and as a benchmark for the dynamic pipeline (`tests/test_reference_models.py`).
+## 8. Security and governance
+* Only the schema, column statistics and at most `GEMINI_SAMPLE_ROWS` sample rows are sent to Gemini; **never the dataset**. In `local` mode nothing leaves the machine.
+* Gemini output is parsed as data (pydantic). Gemini wording is shown only if every number in it appears in the verified result.
+* Raw uploads are deleted after parsing; stored snapshots are removed when a session is deleted or expires. `.env` is git-ignored.
 
-## 10. Error codes
-Every failure returns `{code, error, retryable}`; the UI shows a friendly card.
-`GEMINI_UNAVAILABLE` · `GEMINI_MODEL_UNAVAILABLE` · `INVALID_PLAN` · `INVALID_COLUMN` · `INSUFFICIENT_DATA` · `UNSUPPORTED_OPERATION` · `MODEL_TRAINING_ERROR` · `DATASET_PARSE_ERROR` · `FILE_TOO_LARGE` · `BACKEND_ERROR` (plus `SESSION_NOT_FOUND`, `NO_DATASET`, `BAD_REQUEST`).
+## 9. Limitations
+* One flat table per session; no joins. Planning quality depends on column naming; ambiguous questions trigger clarification.
+* All analyses are descriptive or predictive, **not causal**: root-cause decompositions show *where* a change happened, SHAP shows what a model relies on, and impact estimates are illustrative arithmetic.
+* Trained models are cached in memory (retrained after a restart). Run one server process with several threads.
+* The local planner was evaluated on 104 held-out questions written by the authors; it is not a general-purpose language model.
 
-## 11. Security
-- The API key is read from the environment / `backend/.env`; `.env` is git-ignored and must never be shared or zipped. **If a key has ever been in a shared archive, rotate it.**
-- Gemini output is parsed as data only (pydantic-validated JSON). There is no `exec`/`eval`; a test scans the source for them.
-- Uploads are parsed, held in memory for the session and the temporary file is deleted immediately. Sessions expire after `UDI_SESSION_TTL_SECONDS`.
-- The backend has no authentication; run it on a trusted machine/network.
-
-## 12. Limitations
-- UDI works on a single flat table. It does not join tables, read images/text corpora or handle very wide/very large data efficiently (model training happens at question time; expect seconds to a minute on tens of thousands of rows).
-- It is not guaranteed to work for every dataset. Messy headers, mixed-type columns, free text and unusual date formats can be mis-detected; the profile in the sidebar shows what was detected.
-- Plan quality depends on Gemini and on the column names. Ambiguous questions trigger a clarification; unsupported ones are refused.
-- Model-based outputs are statistical estimates: no causal claims; scenario results are only as good as the underlying model (R² is shown); forecast bands are approximate.
-- Permutation importance is provided; SHAP is not.
-- `.xls` loading and `run_windows.bat` have not been exercised on Windows by the author of this build.
-- Sessions are in memory: restarting Flask loses them.
+## 10. Repository map
+`backend/` API and engines (`app.py`, `planner.py`, `local_planner.py`, `validator.py`, `*_engine.py`, `agents.py`, `report_engine.py`, `data_quality.py`, `relationships.py`, `semantics.py`, `explainability_engine.py`, `storage.py`, `ops.py`) · `frontend/` React app · `evaluation/` benchmark and experiments · `report/` final IEEE paper (LaTeX + PDF) · `docs/` architecture · `MODEL_REPORT.md` reference models · `TEST_REPORT.md` executed tests.

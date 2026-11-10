@@ -21,6 +21,9 @@ OP_LABEL = {
     "get_summary": "summary", "get_current_state": "current-state lookup", "compare_groups": "group comparison",
     "analyze_trend": "trend analysis", "detect_anomalies": "anomaly detection", "calculate_correlation": "correlation analysis",
     "predict_class": "classification", "predict_value": "prediction", "forecast": "forecast", "run_scenario": "scenario analysis",
+    "query_records": "record lookup", "pivot_table": "pivot table", "run_eda": "exploratory analysis", "assess_data_quality": "data-quality check",
+    "describe_relationships": "relationship analysis", "explain_change": "root-cause analysis", "segment_records": "segmentation",
+    "generate_report": "business report",
 }
 NUMERIC_AGGS = {"mean", "sum", "median", "min", "max", "std"}
 MIN_ROWS = {"regression": 30, "classification": 40, "anomaly": 20, "correlation": 20, "trend": 6}
@@ -134,8 +137,9 @@ def validate_plan(plan: AnalysisPlan, df: pd.DataFrame, profile: Dict[str, Any],
     if op == "unsupported" or op not in OPERATIONS:
         raise UDIError("UNSUPPORTED_OPERATION",
                        (plan.reasoning or "This question needs an analysis UDI does not support.") +
-                       " UDI can summarise, look up the latest state, compare groups, analyse trends, detect anomalies, "
-                       "measure correlations, predict values/classes, forecast and run what-if scenarios on the uploaded data.",
+                       " UDI can summarise, list matching records, build pivot tables, look up the latest state, compare groups, analyse trends, "
+                       "explain changes, detect anomalies, measure correlations and column relationships, run EDA and data-quality checks, "
+                       "segment records, predict values/classes, forecast, run what-if scenarios and generate business reports on the uploaded data.",
                        details={"supported_operations": OPERATIONS})
     if plan.needs_clarification and plan.clarification_question:
         raise ClarificationNeeded(plan.clarification_question, [])
@@ -149,7 +153,8 @@ def validate_plan(plan: AnalysisPlan, df: pd.DataFrame, profile: Dict[str, Any],
     if op == "detect_anomalies":
         kind_for_target = "numeric"
     p.target_column = resolve_column(p.target_column, df, roles, op, kind_for_target)
-    p.group_by = _resolve_list(p.group_by, df, roles, op, "categorical" if op == "compare_groups" else "any")
+    p.group_by = _resolve_list(p.group_by, df, roles, op, "categorical" if op in ("compare_groups", "pivot_table", "explain_change") else "any")
+    p.pivot_column = resolve_column(p.pivot_column, df, roles, op, "categorical")
     p.feature_columns = _resolve_list(p.feature_columns, df, roles, op)
     for f in p.filters or []:
         f.column = resolve_column(f.column, df, roles, op)
@@ -159,7 +164,7 @@ def validate_plan(plan: AnalysisPlan, df: pd.DataFrame, profile: Dict[str, Any],
         iv.column = resolve_column(iv.column, df, roles, op)
 
     t_col = _time_col(p, df, roles, profile, op)
-    p.time_column = t_col if op in ("get_current_state", "analyze_trend", "forecast") or p.start_date or p.end_date else p.time_column
+    p.time_column = t_col if op in ("get_current_state", "analyze_trend", "forecast", "explain_change") or p.start_date or p.end_date else p.time_column
 
     # ---- operation-specific requirements ----------------------------------------------
     tgt = p.target_column
@@ -263,6 +268,41 @@ def validate_plan(plan: AnalysisPlan, df: pd.DataFrame, profile: Dict[str, Any],
         if p.aggregation is None or p.aggregation not in NUMERIC_AGGS:
             p.aggregation = "mean"
             assumptions.append(f"No aggregation was specified, so repeated rows in a period are averaged.")
+
+    elif op == "query_records":
+        if tgt and not _is_numeric(df, roles, tgt) and not pd.api.types.is_datetime64_any_dtype(df[tgt]):
+            assumptions.append(f"'{tgt}' is not numeric, so records are listed without sorting by it.")
+        if p.top_n is None:
+            p.top_n = 20
+    elif op == "pivot_table":
+        if not p.group_by:
+            raise ClarificationNeeded(p.clarification_question or "Which column should form the rows of the pivot table?", categorical_columns(df, roles)[:15])
+        if not p.pivot_column and len(p.group_by) < 2:
+            raise ClarificationNeeded(p.clarification_question or f"Which second column should form the columns of the pivot table (rows: {p.group_by[0]})?",
+                                      [c for c in categorical_columns(df, roles) if c != p.group_by[0]][:15])
+        if not p.pivot_column:
+            p.pivot_column = p.group_by[1]
+        p.group_by = p.group_by[:1]
+        if p.pivot_column == p.group_by[0]:
+            raise UDIError("INVALID_PLAN", "The rows and columns of a pivot table must be different columns.")
+        if tgt and not (roles.get(tgt, {}).get("role") == "binary" or (roles.get(tgt, {}).get("role") == "categorical" and df[tgt].nunique() == 2)):
+            _require_kind(df, roles, tgt, op, "numeric", "measure")
+        if p.aggregation not in NUMERIC_AGGS | {None, "count"}:
+            p.aggregation = None
+    elif op == "explain_change":
+        if not t_col:
+            raise UDIError("INSUFFICIENT_DATA", "Explaining a change over time needs a date/time column and the dataset has none.")
+        if tgt:
+            _require_kind(df, roles, tgt, op, "numeric", "measure")
+        if p.aggregation not in (None, "sum", "mean", "count"):
+            p.aggregation = None
+    elif op == "segment_records":
+        if len([c for c in numeric_columns(df, roles) if roles.get(c, {}).get("role") == "numeric"]) < 2:
+            raise UDIError("INSUFFICIENT_DATA", "Segmentation needs at least two numeric columns.")
+    elif op == "generate_report":
+        p.business_function = p.business_function or "general"
+    elif op in ("run_eda", "assess_data_quality", "describe_relationships"):
+        pass
 
     # ---- filters / date ranges against the real values ----------------------------------
     data, filters_applied = apply_filters(df, p, t_col)
