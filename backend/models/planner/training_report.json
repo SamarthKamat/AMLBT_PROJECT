@@ -1,0 +1,9 @@
+{
+  "training_questions": 1658,
+  "intents": 19,
+  "corpus_fingerprint": "982a94b44b17",
+  "in_corpus_cv_accuracy_mean": 0.9632,
+  "in_corpus_cv_accuracy_std": 0.0112,
+  "seconds": 17.5,
+  "saved_to": "/home/user/AMLBT_PROJECT/backend/models/planner/intent_model.joblib"
+}

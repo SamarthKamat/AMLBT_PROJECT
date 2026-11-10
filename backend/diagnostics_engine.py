@@ -14,6 +14,7 @@ from validator import ValidatedPlan, numeric_columns
 PERIOD_ALIAS = {"H": "h", "D": "D", "W": "W-SUN", "M": "M", "Q": "Q", "Y": "Y"}
 FREQ_ORDER = ["H", "D", "W", "M", "Q", "Y"]
 FREQ_NAME = {"H": "hour", "D": "day", "W": "week", "M": "month", "Q": "quarter", "Y": "year"}
+FREQ_ADJ = {"H": "hourly", "D": "daily", "W": "weekly", "M": "monthly", "Q": "quarterly", "Y": "yearly"}
 AGG_FN = {"mean": "mean", "sum": "sum", "median": "median", "min": "min", "max": "max", "std": "std", "count": "count", "nunique": "nunique"}
 
 
@@ -125,7 +126,7 @@ def analyze_trend(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
         chart_rows = [{"period": period_label(i, freq), **{k: (None if pd.isna(s.get(i, np.nan)) else float(s.get(i))) for k, s in series.items()}} for i in idx]
         inc = [r[g] for r in rows if r["direction"] == "increasing"]
         dec = [r[g] for r in rows if r["direction"] == "decreasing"]
-        summary = (f"{measure_title} by {g} ({FREQ_NAME[freq]}ly): increasing for {', '.join(inc) or 'no group'}, decreasing for {', '.join(dec) or 'no group'}; "
+        summary = (f"{measure_title} by {g} ({FREQ_ADJ[freq]}): increasing for {', '.join(inc) or 'no group'}, decreasing for {', '.join(dec) or 'no group'}; "
                    f"the other groups show no statistically significant trend.")
         return make_result("analyze_trend", summary, title=f"{measure_title} trend by {g}", table=rows, table_title=f"Trend per {g}",
                            metrics={"Groups analysed": len(rows), "Period": FREQ_NAME[freq]},

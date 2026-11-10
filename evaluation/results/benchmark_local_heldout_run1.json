@@ -1,0 +1,176 @@
+{
+  "planner": "local",
+  "questions": 104,
+  "datasets": 6,
+  "seconds_total": 266.2,
+  "intent_accuracy": {
+    "correct": 101,
+    "n": 104,
+    "rate": 0.9712
+  },
+  "intent_accuracy_answerable": {
+    "correct": 90,
+    "n": 93,
+    "rate": 0.9677
+  },
+  "column_mapping_accuracy": {
+    "correct": 64,
+    "n": 75,
+    "rate": 0.8533
+  },
+  "filter_accuracy": {
+    "correct": 5,
+    "n": 5,
+    "rate": 1.0
+  },
+  "invalid_request_rejection": {
+    "correct": 10,
+    "n": 11,
+    "rate": 0.9091
+  },
+  "numerical_correctness": {
+    "correct": 26,
+    "n": 29,
+    "rate": 0.8966
+  },
+  "answered_when_answerable": {
+    "correct": 91,
+    "n": 93,
+    "rate": 0.9785
+  },
+  "end_to_end_pass": {
+    "correct": 92,
+    "n": 104,
+    "rate": 0.8846
+  },
+  "median_seconds": 0.02,
+  "per_dataset": {
+    "superstore": {
+      "correct": 25,
+      "n": 25,
+      "rate": 1.0
+    },
+    "hr": {
+      "correct": 17,
+      "n": 20,
+      "rate": 0.85
+    },
+    "telco": {
+      "correct": 16,
+      "n": 18,
+      "rate": 0.8889
+    },
+    "bank": {
+      "correct": 12,
+      "n": 15,
+      "rate": 0.8
+    },
+    "company": {
+      "correct": 12,
+      "n": 14,
+      "rate": 0.8571
+    },
+    "hospital": {
+      "correct": 10,
+      "n": 12,
+      "rate": 0.8333
+    }
+  },
+  "per_operation_intent": {
+    "analyze_trend": {
+      "correct": 4,
+      "n": 4,
+      "rate": 1.0
+    },
+    "assess_data_quality": {
+      "correct": 3,
+      "n": 3,
+      "rate": 1.0
+    },
+    "calculate_correlation": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0
+    },
+    "compare_groups": {
+      "correct": 21,
+      "n": 21,
+      "rate": 1.0
+    },
+    "describe_relationships": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0
+    },
+    "detect_anomalies": {
+      "correct": 6,
+      "n": 6,
+      "rate": 1.0
+    },
+    "explain_change": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0
+    },
+    "forecast": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0
+    },
+    "generate_report": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0
+    },
+    "get_current_state": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0
+    },
+    "get_summary": {
+      "correct": 19,
+      "n": 21,
+      "rate": 0.9048
+    },
+    "pivot_table": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0
+    },
+    "predict_class": {
+      "correct": 5,
+      "n": 6,
+      "rate": 0.8333
+    },
+    "predict_value": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0
+    },
+    "query_records": {
+      "correct": 4,
+      "n": 4,
+      "rate": 1.0
+    },
+    "run_eda": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0
+    },
+    "run_scenario": {
+      "correct": 3,
+      "n": 3,
+      "rate": 1.0
+    },
+    "segment_records": {
+      "correct": 4,
+      "n": 4,
+      "rate": 1.0
+    },
+    "unsupported": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0
+    }
+  }
+}

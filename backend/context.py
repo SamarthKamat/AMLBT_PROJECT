@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, Optional
 SEED = 42
 MODEL_CACHE_SIZE = 8
 # Bump when training/selection logic changes so stale cached models are never reused.
-MODEL_CONFIG_VERSION = "2"
+MODEL_CONFIG_VERSION = "3"
 
 
 class ModelCache:
@@ -52,3 +52,12 @@ class ExecContext:
     cache: ModelCache = field(default_factory=ModelCache)
     seed: int = SEED
     dataset_id: str = ""
+    semantics: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    artifacts: Dict[str, Any] = field(default_factory=dict)      # per-dataset computed artefacts (relationships, quality, ...)
+    full_data: Any = None                                         # the whole (unfiltered) dataset, for whole-dataset operations
+
+    def memo(self, key: str, factory: Callable[[], Any]) -> Any:
+        """Compute a dataset-level artefact once per dataset version."""
+        if key not in self.artifacts:
+            self.artifacts[key] = factory()
+        return self.artifacts[key]

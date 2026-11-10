@@ -7,14 +7,21 @@ from __future__ import annotations
 from typing import List, Literal, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+# Phase 1 operations (10) + Phase 2 operations (8). Gemini / the local planner may only choose from this list.
 OPERATIONS = [
     "get_summary", "get_current_state", "compare_groups", "analyze_trend", "detect_anomalies",
     "calculate_correlation", "predict_class", "predict_value", "forecast", "run_scenario",
+    "query_records", "pivot_table", "run_eda", "assess_data_quality", "describe_relationships",
+    "explain_change", "segment_records", "generate_report",
 ]
 Operation = Literal[
     "get_summary", "get_current_state", "compare_groups", "analyze_trend", "detect_anomalies",
-    "calculate_correlation", "predict_class", "predict_value", "forecast", "run_scenario", "unsupported",
+    "calculate_correlation", "predict_class", "predict_value", "forecast", "run_scenario",
+    "query_records", "pivot_table", "run_eda", "assess_data_quality", "describe_relationships",
+    "explain_change", "segment_records", "generate_report", "unsupported",
 ]
+BusinessFunction = Literal["general", "sales", "marketing", "hr", "operations", "finance", "customer"]
+ChartType = Literal["auto", "bar", "line", "pie", "scatter", "heatmap", "box", "histogram", "area", "table"]
 Aggregation = Literal["mean", "sum", "median", "min", "max", "std", "count", "nunique", "distribution", "percentage"]
 Frequency = Literal["H", "D", "W", "M", "Q", "Y"]
 FilterOp = Literal["eq", "ne", "gt", "gte", "lt", "lte", "in", "not_in", "between", "contains"]
@@ -71,6 +78,16 @@ class AnalysisPlan(BaseModel):
 
     scenario_changes: Optional[List[ScenarioChange]] = None
     input_values: Optional[List[InputValue]] = None
+
+    # ---- Phase 2 fields
+    pivot_column: Optional[str] = Field(default=None, description="pivot_table: the column whose values become the table columns (group_by gives the rows).")
+    business_function: Optional[BusinessFunction] = Field(default=None, description="generate_report: the business purpose of the report.")
+    chart_type: Optional[ChartType] = Field(default=None, description="Chart the user explicitly asked for (pie, line, ...); auto otherwise.")
+    n_clusters: Optional[int] = Field(default=None, ge=2, le=10, description="segment_records: number of segments if the user names one.")
+    comparison_start: Optional[str] = Field(default=None, description="explain_change: start (ISO date) of the later/comparison period.")
+    comparison_end: Optional[str] = Field(default=None, description="explain_change: end of the comparison period.")
+    baseline_start: Optional[str] = Field(default=None, description="explain_change: start of the earlier/baseline period.")
+    baseline_end: Optional[str] = Field(default=None, description="explain_change: end of the baseline period.")
 
     uses_previous_context: bool = False
     reasoning: str = ""

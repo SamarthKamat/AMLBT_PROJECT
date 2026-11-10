@@ -18,7 +18,19 @@ import pandas as pd
 from errors import UDIError
 
 NA_VALUES = ["", " ", "NA", "N/A", "n/a", "NaN", "nan", "NULL", "null", "None", "none", "-", "--", "#N/A", "#NA", "?"]
-_ID_NAME = re.compile(r"(^|[^a-z])(id|uuid|guid|key|ref|idx|index|sku)([^a-z]|$)", re.I)
+_ID_TOKEN = re.compile(r"(^|[^a-z])(id|uuid|guid|key|ref|idx|index|sku|number|code|postal|zip|pincode|phone|mobile)([^a-z]|$)", re.I)
+_ID_CAMEL = re.compile(r"[a-z](ID|Id|Number|Code|No)$")          # customerID, EmployeeNumber, ZipCode
+_CODE_NAME = re.compile(r"(postal|zip|pin_?code|phone|mobile)", re.I)
+
+
+class _IdName:
+    """Name hint for identifier-like columns (used together with value checks, never alone)."""
+    @staticmethod
+    def search(name: str) -> bool:
+        return bool(_ID_TOKEN.search(name) or _ID_CAMEL.search(name))
+
+
+_ID_NAME = _IdName()
 _CURRENCY = re.compile(r"[,\s₹$€£¥]")
 FREQ_LABEL = {"H": "hourly", "D": "daily", "W": "weekly", "M": "monthly", "Q": "quarterly", "Y": "yearly"}
 
@@ -243,7 +255,7 @@ def infer_roles(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
                           and len(steps) > 0 and float((steps == 1).mean()) >= 0.95)       # 1,2,3,... style row index
             if nun <= 1:
                 info.update(role="constant", reason="single distinct value")
-            elif _ID_NAME.search(str(col)) and unique_ratio >= 0.5 and _is_integer_valued(s) and n >= 20:
+            elif _ID_NAME.search(str(col)) and _is_integer_valued(s) and n >= 20 and (unique_ratio >= 0.5 or (_CODE_NAME.search(str(col)) and nun > 20)):
                 info.update(role="identifier", reason="identifier-like name with mostly unique integer values")
             elif sequential:
                 info.update(role="identifier", reason="sequential integer index")
@@ -363,15 +375,20 @@ def profile_dataframe(df: pd.DataFrame, name: str = "dataset") -> Dict[str, Any]
     }
 
 
-def profile_for_llm(profile: Dict[str, Any], df: pd.DataFrame, sample_rows: int = 3) -> Dict[str, Any]:
+def profile_for_llm(profile: Dict[str, Any], df: pd.DataFrame, sample_rows: int = 3, semantics: Optional[Dict[str, Any]] = None,
+                    relationships: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Compact, schema-level view of the dataset for Gemini. The dataset itself is never sent."""
     cols = []
+    semantics = semantics or {}
     for c in profile["columns"][:200]:
         item = {k: v for k, v in c.items() if k in (
             "name", "role", "unique_values", "missing_pct", "min", "max", "mean", "median", "start", "end",
             "inferred_frequency", "rows_per_timestamp", "integer_valued", "high_cardinality")}
         if "top_values" in c:
             item["values"] = [t["value"] for t in c["top_values"]]
+        if c["name"] in semantics:
+            item["semantic"] = semantics[c["name"]]["semantic"]
+            item["additive"] = semantics[c["name"]]["additive"]
         cols.append(item)
     out = {
         "rows": profile["rows"],
@@ -379,6 +396,8 @@ def profile_for_llm(profile: Dict[str, Any], df: pd.DataFrame, sample_rows: int 
         "primary_time_column": profile.get("primary_time_column"),
         "date_range": profile.get("date_range"),
     }
+    if relationships:
+        out["relationships"] = relationships
     if sample_rows > 0:
         head = df.head(sample_rows).copy()
         for c in head.columns:

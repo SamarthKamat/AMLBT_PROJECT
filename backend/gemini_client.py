@@ -47,7 +47,15 @@ OPERATIONS (choose exactly one; `operation` must be one of: {', '.join(OPERATION
 - predict_class: predict a CATEGORY / label / risk class / yes-no outcome. target_column = the categorical (or few-valued coded) column.
 - forecast: values in the FUTURE (next week/month/quarter/year...). Needs time_column and a numeric target_column. frequency (H D W M Q Y) = the resolution of the forecast that matches the question; forecast_horizon = number of periods of that frequency. aggregation = how rows within a period combine (sum for additive quantities, mean for levels/rates).
 - run_scenario: what-if / sensitivity: effect on a numeric outcome (target_column) when drivers change. scenario_changes = list of {{column, change_type percent|absolute|set, value}} ("+10%" is percent 10; "-5%" is percent -5). If the user does not say which outcome to estimate and earlier turns do not make it clear, ask for clarification.
-- unsupported: the question cannot be answered by any operation above (causal "why" questions needing experiments, questions unrelated to the data, requests for actions).
+- query_records: list the individual records that match conditions, optionally sorted by a measure ("show the top 10 orders by profit in India", "employees in Sales with income above 15000"). filters hold the conditions; target_column is the sort measure; sort_order; top_n (default 20); feature_columns = extra columns to show.
+- pivot_table: a measure by TWO dimensions ("total sales by region and category", "cross-tab of department and attrition"). group_by = [row dimension], pivot_column = column dimension, target_column + aggregation = the measure (no target = record counts).
+- run_eda: exploratory data analysis of the whole dataset (no target_column) or a deep dive into one column (target_column): distributions, skew, outliers, missingness, associations, time coverage.
+- assess_data_quality: data quality score, missing values, duplicates, invalid or inconsistent values, recommended cleaning.
+- describe_relationships: how the columns relate to each other (association map, hierarchies such as City->Country, derived columns such as Profit = Sales - Cost, data dictionary). Optional target_column to focus on one column.
+- explain_change: WHY / WHERE a measure changed between two periods (root-cause decomposition by dimensions). target_column + aggregation = the measure; group_by = dimensions to examine (optional); baseline_start/baseline_end and comparison_start/comparison_end only if the user names the periods; otherwise the last two complete periods of `frequency` are compared.
+- segment_records: cluster / segment records (customers, employees ...) into groups with K-means. feature_columns = numeric columns to use if the user names them; n_clusters if the user names a number.
+- generate_report: a business report for a function. business_function = sales | marketing | hr | operations | finance | customer | general (pick from the words used: "HR", "people" -> hr; "campaign", "marketing" -> marketing; "inventory", "logistics", "operations" -> operations; "profitability", "finance" -> finance; "churn", "customers" -> customer). Optional target_column = the outcome/KPI of interest.
+- unsupported: the question cannot be answered by any operation above (questions unrelated to the data, requests for actions such as sending emails or deleting data).
 
 COLUMN RULES (critical):
 1. Use ONLY column names that appear in `dataset.columns[].name`, copied EXACTLY.
@@ -55,6 +63,8 @@ COLUMN RULES (critical):
 3. If the user asks about a variable that has no matching column, copy the user's wording unchanged into target_column (or the relevant field). Do not pick another column; the system will tell the user the variable is missing.
 4. Filters: use `filters` for restrictions such as "only for X", "in region Y", "where age > 30". Use values exactly as listed in `columns[].values` when available. Dates: start_date / end_date as ISO yyyy-mm-dd; resolve relative phrases (last quarter, this year, 2025) against dataset.date_range, treating its end as "now".
 5. time_column must be a datetime column; omit it to use the dataset's primary time column.
+5b. "Which X has the highest Y" is compare_groups with group_by=[X], target_column=Y, sort_order=desc. Use aggregation "sum" for additive measures (columns whose `semantic` is money/quantity with `additive`=true, e.g. sales, revenue, quantity) and "mean" for levels, rates, scores, ages and prices. A rate of a yes/no outcome by group (e.g. "attrition rate by department") is compare_groups with target_column = the outcome column.
+5c. If the user asks for a specific chart ("as a pie chart", "line chart"), set chart_type.
 6. Never invent columns, groups, dates or metrics.
 
 FOLLOW-UPS:
@@ -63,7 +73,8 @@ FOLLOW-UPS:
 - If the question is genuinely ambiguous and a wrong guess would give a misleading answer, set needs_clarification=true with ONE short clarification_question (still fill in everything you can). Do not ask when a reasonable reading exists.
 
 OUTPUT: a single JSON object with the plan fields only. `intent`: one line stating what the user wants. `reasoning`: one or two sentences on why this operation and these columns (no numbers). `model_type` is informational (regression, classification, time_series, anomaly, correlation, none).
-The domain (e.g. Hospital, Company) is only vocabulary context; the dataset schema alone decides what is possible. Do not assume columns exist because of the domain."""
+The domain (e.g. Hospital, Company) is only vocabulary context; the dataset schema alone decides what is possible. Do not assume columns exist because of the domain.
+`dataset.columns[].semantic` (money, quantity, rate, score, geography, outcome ...) and `dataset.relationships` (strong pairs, hierarchies, derived formulas) describe the columns; use them to choose sensible targets and aggregations."""
 
 EXPLAIN_SYSTEM = """You are the explanation layer of UDI. Python has already computed and verified the result in `verified_result`.
 Write a concise answer (at most 120 words) to the user's question using ONLY facts present in `verified_result`.

@@ -14,8 +14,15 @@ from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
+try:                                                     # statsmodels is optional: ETS / ARIMA candidates
+    from statsmodels.tsa.holtwinters import ExponentialSmoothing
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
+    HAVE_SM = True
+except Exception:                                        # pragma: no cover
+    HAVE_SM = False
+
 from context import ExecContext
-from diagnostics_engine import FREQ_NAME, PERIOD_ALIAS, aggregate_series, native_frequency, period_label
+from diagnostics_engine import FREQ_ADJ, FREQ_NAME, PERIOD_ALIAS, aggregate_series, native_frequency, period_label
 from errors import UDIError
 from result_formatter import fmt_num, make_result, records
 from validator import ValidatedPlan
@@ -92,6 +99,34 @@ def _make_ar(model_factory: Callable[[], Any]):
     return fn
 
 
+def _ets(y, h, m):
+    seasonal = "add" if (m and len(y) >= 2 * m) else None
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        fit = ExponentialSmoothing(np.asarray(y, float), trend="add", damped_trend=True, seasonal=seasonal,
+                                   seasonal_periods=m if seasonal else None, initialization_method="estimated").fit(optimized=True)
+    return np.asarray(fit.forecast(h), float)
+
+
+def _arima(y, h, m):
+    """Small AIC search over ARIMA orders; seasonal (1,0,1,m) term when the history covers >= 3 seasons."""
+    y = np.asarray(y, float)
+    seasonal = (1, 0, 1, m) if (m and 2 <= m <= 24 and len(y) >= 3 * m) else (0, 0, 0, 0)
+    best, best_aic = None, np.inf
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        for order in ((1, 1, 1), (0, 1, 1), (2, 1, 1)):
+            try:
+                res = SARIMAX(y, order=order, seasonal_order=seasonal, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False, maxiter=60)
+                if np.isfinite(res.aic) and res.aic < best_aic:
+                    best, best_aic = res, res.aic
+            except Exception:
+                continue
+    if best is None:
+        raise ValueError("no ARIMA order converged")
+    return np.asarray(best.forecast(h), float)
+
+
 def _candidates(m: int, n: int) -> Dict[str, Callable]:
     c: Dict[str, Callable] = {"Naive (last value)": _naive}
     if m:
@@ -101,7 +136,43 @@ def _candidates(m: int, n: int) -> Dict[str, Callable]:
     c["Autoregressive Ridge (lags + trend)"] = _make_ar(lambda: make_pipeline(StandardScaler(), Ridge(alpha=1.0)))
     c["Random Forest (lags)"] = _make_ar(lambda: RandomForestRegressor(n_estimators=200, min_samples_leaf=2, n_jobs=-1, random_state=42))
     c["Gradient Boosting (lags)"] = _make_ar(lambda: GradientBoostingRegressor(n_estimators=150, max_depth=3, learning_rate=0.06, random_state=42))
+    if HAVE_SM and n >= MIN_PERIODS:
+        c["Holt-Winters ETS (damped trend" + (" + seasonal)" if m else ")")] = _ets
+        if n <= 800:
+            c["ARIMA / SARIMA (AIC-selected)" if m else "ARIMA (AIC-selected)"] = _arima
     return c
+
+
+def choose_frequency(d: pd.DataFrame, tc: str, tgt: str, agg: str, requested: Optional[str]) -> Tuple[str, Optional[str]]:
+    """Requested frequency, else the native one coarsened until the series is dense enough to forecast
+    (<= 20% empty periods) while keeping at least MIN_PERIODS periods. Returns (freq, note)."""
+    native = native_frequency(d[tc])
+    if requested:
+        return requested, None
+    order = ["H", "D", "W", "M", "Q", "Y"]
+    for f in order[order.index(native):]:
+        s = aggregate_series(d, tc, tgt, agg, f)
+        if len(s) and s.isna().mean() <= MAX_MISSING_FRACTION and s.notna().sum() >= MIN_PERIODS:
+            if f != native:
+                return f, (f"The data has gaps at its native {FREQ_ADJ[native]} spacing, so it was aggregated to {FREQ_ADJ[f]} periods "
+                           f"({int(s.notna().sum())} periods, {s.isna().mean():.0%} empty).")
+            return f, None
+    return native, None
+
+
+def _interval_sigmas(errors: List[np.ndarray], horizon: int, h_bt: int) -> np.ndarray:
+    """Horizon-dependent error scale from backtest errors: RMS error at each step ahead (made non-decreasing),
+    extrapolated with sqrt(step) beyond the backtest block."""
+    E = np.vstack([e[:h_bt] for e in errors if len(e) >= h_bt]) if errors else np.zeros((0, h_bt))
+    if E.size == 0:
+        return np.full(horizon, np.nan)
+    step = np.sqrt(np.mean(E ** 2, axis=0))
+    pooled = float(np.sqrt(np.mean(E ** 2)))
+    step = np.maximum.accumulate(np.maximum(step, 0.5 * pooled))         # few folds: never narrower than half the pooled error
+    out = np.empty(horizon)
+    for i in range(horizon):
+        out[i] = step[i] if i < len(step) else step[-1] * np.sqrt((i + 1) / len(step))
+    return out
 
 
 # ----------------------------------------------------------------------------- engine
@@ -128,8 +199,8 @@ def _metrics(actual: np.ndarray, pred: np.ndarray) -> Dict[str, Optional[float]]
 
 def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
     p, d, tc, tgt = vp.plan, vp.data, vp.time_column, vp.plan.target_column
-    freq = p.frequency or native_frequency(d[tc])
     agg = p.aggregation or "mean"
+    freq, freq_note = choose_frequency(d, tc, tgt, agg, p.frequency)
     unit = FREQ_NAME[freq]
     s = aggregate_series(d, tc, tgt, agg, freq)
     have = int(s.notna().sum())
@@ -140,11 +211,11 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
         if finer:
             alt = aggregate_series(d, tc, tgt, agg, finer)
             if alt.notna().sum() >= MIN_PERIODS:
-                hint = f" The data would support a forecast at {FREQ_NAME[finer]}ly resolution ({int(alt.notna().sum())} periods)."
+                hint = f" The data would support a forecast at {FREQ_ADJ[finer]} resolution ({int(alt.notna().sum())} periods)."
         raise UDIError("INSUFFICIENT_DATA", f"Only {have} {unit}(s) of history are available for '{tgt}'; forecasting needs at least {MIN_PERIODS} distinct periods.{hint}",
                        details={"periods": have, "frequency": freq, "required": MIN_PERIODS})
     if len(s) and gaps / len(s) > MAX_MISSING_FRACTION:
-        raise UDIError("INSUFFICIENT_DATA", f"{gaps} of {len(s)} {unit}s have no data (over {MAX_MISSING_FRACTION:.0%}); the series is too sparse to forecast at {unit}ly resolution.")
+        raise UDIError("INSUFFICIENT_DATA", f"{gaps} of {len(s)} {unit}s have no data (over {MAX_MISSING_FRACTION:.0%}); the series is too sparse to forecast at {FREQ_ADJ[freq]} resolution.")
     n_total = len(s)
     horizon = p.forecast_horizon or DEFAULT_HORIZON[freq]
     if horizon > n_total // 3:
@@ -192,15 +263,20 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
     fc = np.asarray(fn(y, horizon, m), dtype=float)
     pooled = np.concatenate(errors_pool[best["model"]]) if errors_pool.get(best["model"]) else np.array([best["RMSE"]])
     sigma = float(np.sqrt(np.mean(pooled ** 2)))
+    sig_h = _interval_sigmas(errors_pool.get(best["model"], []), horizon, h_bt)
+    sig_h = np.where(np.isnan(sig_h), sigma, sig_h)
     last_p = s.index[-1]
     future_idx = pd.period_range(last_p + 1, periods=horizon, freq=PERIOD_ALIAS[freq])
-    f_rows = [{"period": period_label(i, freq), "forecast": float(v), "lower_80": float(v - 1.2816 * sigma), "upper_80": float(v + 1.2816 * sigma)}
-              for i, v in zip(future_idx, fc)]
+    f_rows = [{"period": period_label(i, freq), "forecast": float(v), "lower_80": float(v - 1.2816 * sh), "upper_80": float(v + 1.2816 * sh),
+               "lower_95": float(v - 1.96 * sh), "upper_95": float(v + 1.96 * sh)}
+              for i, v, sh in zip(future_idx, fc, sig_h)]
     hist_keep = min(n_total, max(60, horizon * 4))
     hist_rows = [{"period": period_label(i, freq), "actual": None if pd.isna(v) else float(v)} for i, v in zip(s.index[-hist_keep:], s.to_numpy()[-hist_keep:])]
-    joined = hist_rows + [{"period": r["period"], "forecast": r["forecast"], "lower": r["lower_80"], "upper": r["upper_80"]} for r in f_rows]
+    joined = hist_rows + [{"period": r["period"], "forecast": r["forecast"], "lower": r["lower_80"], "upper": r["upper_80"],
+                           "lower95": r["lower_95"], "upper95": r["upper_95"]} for r in f_rows]
     if hist_rows and hist_rows[-1]["actual"] is not None:      # connect the two lines
-        joined[len(hist_rows) - 1].update(forecast=hist_rows[-1]["actual"], lower=hist_rows[-1]["actual"], upper=hist_rows[-1]["actual"])
+        a = hist_rows[-1]["actual"]
+        joined[len(hist_rows) - 1].update(forecast=a, lower=a, upper=a, lower95=a, upper95=a)
     skill = None
     if best_baseline and best_baseline["RMSE"] > 0:
         skill = (1 - best["RMSE"] / best_baseline["RMSE"]) * 100
@@ -209,7 +285,7 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
                f"averaging {fmt_num(float(np.mean(fc)))}. Selected model: {best['model']} (rolling backtest RMSE {fmt_num(best['RMSE'])}, MAE {fmt_num(best['MAE'])}"
                + (f", MAPE {best['MAPE']:.1f}%" if best["MAPE"] is not None else "") + ").")
     lim = ["Forecasts assume historical patterns continue; they cannot anticipate events, policy changes or shocks outside the data.",
-           f"The 80% range is approximate: it uses the size of errors seen in the backtest ({folds} fold(s) of {h_bt} {unit}(s)), not a formal probability model.",
+           f"The 80% and 95% ranges are approximate: they use the size of errors seen at each step ahead in the backtest ({folds} fold(s) of {h_bt} {unit}(s)), widening with the horizon; they are not a formal probability model.",
            "Observations were never shuffled: every backtest forecast uses only data from before its test block."]
     if skill is not None:
         if skill <= 0:
@@ -219,8 +295,10 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
     if gaps:
         lim.append(f"{gaps} {unit}(s) without data were filled by linear interpolation.")
     assumptions = list(vp.assumptions)
-    if not p.frequency:
-        assumptions.append(f"The series was forecast at its natural {unit}ly resolution.")
+    if freq_note:
+        assumptions.append(freq_note)
+    elif not p.frequency:
+        assumptions.append(f"The series was forecast at its natural {FREQ_ADJ[freq]} resolution.")
     metrics = {"Selected model": best["model"], "Backtest RMSE": best["RMSE"], "Backtest MAE": best["MAE"], "Horizon": f"{horizon} {unit}(s)",
                "History": f"{n_total} {unit}s", "Forecast average": float(np.mean(fc))}
     if best["MAPE"] is not None:
@@ -232,5 +310,5 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
                                    "backtest": {"folds": folds, "test_block_periods": h_bt, "min_train_periods": MIN_TRAIN}, "metrics": {k: best[k] for k in ("MAE", "RMSE", "MAPE")},
                                    "baseline": best_baseline, "skill_vs_baseline_%": skill, "candidates": scores, "seasonal_period": m},
                        forecast={"target": tgt, "frequency": freq, "aggregation": agg, "horizon": horizon, "history_periods": n_total, "periods": f_rows,
-                                 "interval": "approximate 80% range from backtest errors"},
+                                 "interval": "approximate 80% / 95% ranges from step-ahead backtest errors"},
                        limitations=lim, assumptions=assumptions)

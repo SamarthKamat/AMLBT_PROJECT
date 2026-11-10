@@ -1,4 +1,18 @@
-# UDI Domain Reference Model Report
+# UDI Model Report
+
+## Phase 2: models selected at run time on public datasets
+Produced by `python evaluation/run_real_datasets.py` (seed 42; full numbers in `evaluation/results/real_datasets.json`).
+
+| Dataset / target | Selected (how) | CV (mean ± sd) | Held-out | Baseline | Top SHAP drivers |
+|---|---|---|---|---|---|
+| Global Superstore / Profit | Random Forest (one-SE rule over GBM; tuned) | RMSE 395.7 ± 43.3 | R² 0.707, RMSE 290.4 | RMSE 536.2 | Discount, Sales, Shipping Cost |
+| IBM HR / Attrition | XGBoost | macro-F1 0.718 ± 0.042 | F1 0.636, ROC-AUC 0.796, PR-AUC 0.504 | acc. 0.840 | OverTime, MonthlyIncome, Age |
+| IBM Telco / Churn | Random Forest | macro-F1 0.734 ± 0.012 | F1 0.728, ROC-AUC 0.834, PR-AUC 0.640 | acc. 0.735 | Contract, InternetService, tenure |
+| UCI Bank / y | Random Forest | macro-F1 0.782 ± 0.011 | F1 0.793, ROC-AUC 0.944, PR-AUC 0.661 | acc. 0.888 | duration, emp.var.rate, nr.employed |
+
+Local planner intent model: TF-IDF (word 1–3 + char 2–5 grams) + logistic regression, 1,658 templated training questions, 19 classes, in-corpus 5-fold CV accuracy 0.963 ± 0.011 (`backend/models/planner/training_report.json`). Its real evaluation is the held-out benchmark (README §6).
+
+# Phase 1: domain reference models
 
 > **Reference / validation / demonstration only.** These artifacts document the seven bundled demo datasets and serve as a benchmark. UDI never loads them when answering questions about an uploaded dataset: each question trains and selects its own models (see README, section 4). `python backend/reference_models.py --validate` reloads them and checks that they reproduce the stored metrics.
 

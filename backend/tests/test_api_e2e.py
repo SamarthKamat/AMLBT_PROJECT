@@ -30,6 +30,16 @@ QUESTIONS = [
     ("What if distances grow by 20%?", dict(operation="run_scenario", target_column="Delivery_Time", scenario_changes=[{"column": "Distance", "change_type": "percent", "value": 20}]), "run_scenario"),
     ("Total distance by vehicle type", dict(operation="compare_groups", target_column="Distance", group_by=["Vehicle_Type"], aggregation="sum"), "compare_groups"),
     ("Highest delivery time city", dict(operation="compare_groups", target_column="Delivery_Time", group_by=["City"], aggregation="mean", sort_order="desc", top_n=1), "compare_groups"),
+    # Phase 2 operations
+    ("Show the 5 slowest deliveries in Goa", dict(operation="query_records", target_column="Delivery_Time", sort_order="desc", top_n=5,
+                                                   filters=[{"column": "City", "operator": "eq", "value": "Goa"}]), "query_records"),
+    ("Average delivery time by city and traffic", dict(operation="pivot_table", target_column="Delivery_Time", group_by=["City"], pivot_column="Traffic", aggregation="mean"), "pivot_table"),
+    ("Perform EDA", dict(operation="run_eda"), "run_eda"),
+    ("Check data quality", dict(operation="assess_data_quality"), "assess_data_quality"),
+    ("How are the columns related?", dict(operation="describe_relationships"), "describe_relationships"),
+    ("Why did delivery time change last month?", dict(operation="explain_change", target_column="Delivery_Time", aggregation="mean", frequency="M"), "explain_change"),
+    ("Segment the deliveries", dict(operation="segment_records"), "segment_records"),
+    ("Generate an operations report", dict(operation="generate_report", business_function="operations"), "generate_report"),
 ]
 
 
@@ -38,8 +48,8 @@ def csv_bytes():
     return datasets.delivery_df(anomalies=True).to_csv(index=False).encode()
 
 
-def new_client(llm=None, store=None):
-    app = create_app(llm=llm, store=store)
+def new_client(llm=None, store=None, planner_mode=None):
+    app = create_app(llm=llm, store=store, planner_mode=planner_mode)
     return app.test_client(), app
 
 
@@ -95,12 +105,12 @@ def test_twelve_different_questions_route_to_different_operations(env):
         assert body["result"]["success"] and body["result"]["operation"] == expected_op
         assert body["answer"] and body["answer_source"] in ("gemini", "python_summary")
         used.append(expected_op)
-    assert set(used) == set(OPERATIONS)                                   # all ten operations exercised on one dataset
+    assert set(used) == set(OPERATIONS)                                   # all eighteen operations exercised on one dataset
     route = client.get(f"/api/session/{sid}/routing").get_json()
     ops = [x["operation"] for x in route["routing"]]
-    assert ops == used and len({*ops}) == 10
+    assert ops == used and len({*ops}) == len(OPERATIONS)
     ml = {x["operation"] for x in route["routing"] if x["ml"]}
-    assert ml == {"predict_value", "predict_class", "forecast", "run_scenario"} | ({"detect_anomalies"} & ml)
+    assert ml == {"predict_value", "predict_class", "forecast", "run_scenario", "segment_records", "generate_report"} | ({"detect_anomalies"} & ml)
     assert not any(x["ml"] for x in route["routing"] if x["operation"] in ("get_summary", "get_current_state", "compare_groups", "analyze_trend", "calculate_correlation"))
     assert route["model_cache"]["hits"] >= 1                              # the scenario reused the regression model trained for the prediction
 
@@ -182,19 +192,32 @@ def test_unsupported_operation(env):
 
 
 def test_gemini_down_gives_structured_error_and_no_result(csv_bytes):
-    client, _ = new_client(DownLLM())
+    """Strict Gemini mode (UDI_PLANNER=gemini) keeps the Phase 1 guarantee: no Gemini, no guessed plan."""
+    client, _ = new_client(DownLLM(), planner_mode="gemini")
     sid = upload(client, csv_bytes).get_json()["session_id"]
     r = ask(client, sid, AVG[0])
     body = r.get_json()
     assert r.status_code >= 400 and body["code"] == "GEMINI_UNAVAILABLE" and "result" not in body and "answer" not in body
     h = client.get("/api/health").get_json()
-    assert h["gemini_enabled"] is False and h["status"] == "gemini_not_ready"
+    assert h["gemini_enabled"] is False and h["planner"]["mode"] == "gemini"
     # data upload and profiling still work without Gemini
     assert upload(client, csv_bytes).status_code == 200
 
 
+def test_auto_mode_uses_local_planner_when_gemini_is_down(csv_bytes):
+    """Default auto mode: without Gemini the trained local intent model plans the question; the result is still computed by Python."""
+    client, _ = new_client(DownLLM(), planner_mode="auto")
+    sid = upload(client, csv_bytes).get_json()["session_id"]
+    body = ask(client, sid, AVG[0]).get_json()
+    assert body["type"] == "answer" and body["planner"] == "local"
+    assert body["plan"]["operation"] == "get_summary" and body["plan"]["target_column"] == "Delivery_Time" and body["plan"]["aggregation"] == "mean"
+    expected = datasets.delivery_df(anomalies=True)["Delivery_Time"].mean()
+    assert abs(body["result"]["metrics"]["Average of Delivery_Time"] - expected) < 1e-6
+    assert client.get("/api/health").get_json()["planner"]["effective"] == "local"
+
+
 def test_model_unavailable_code_passthrough(csv_bytes):
-    client, _ = new_client(DownLLM("GEMINI_MODEL_UNAVAILABLE", "Model 'x' not found."))
+    client, _ = new_client(DownLLM("GEMINI_MODEL_UNAVAILABLE", "Model 'x' not found."), planner_mode="gemini")
     sid = upload(client, csv_bytes).get_json()["session_id"]
     body = ask(client, sid, "hello").get_json()
     assert body["code"] == "GEMINI_MODEL_UNAVAILABLE"

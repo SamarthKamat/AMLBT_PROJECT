@@ -1,0 +1,17 @@
+# docker compose up --build   ->  http://localhost:5000
+# Put GEMINI_API_KEY / GEMINI_MODEL in backend/.env (optional: without them UDI uses its local planner).
+services:
+  udi:
+    build: .
+    ports: ["5000:5000"]
+    env_file:
+      - path: backend/.env
+        required: false
+    environment:
+      UDI_DATA_DIR: /data
+      UDI_AUTH: "${UDI_AUTH:-off}"
+    volumes:
+      - udi-data:/data
+    restart: unless-stopped
+volumes:
+  udi-data:
