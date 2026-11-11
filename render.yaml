@@ -1,0 +1,21 @@
+# Render Blueprint - free tier. https://render.com/docs/blueprint-spec
+# Deploys the whole app (React build + Flask API) from the Dockerfile. URL: https://eda-tool.onrender.com
+services:
+  - type: web
+    name: EDA_TOOL
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: UDI_PLANNER
+        value: auto          # local planner unless GEMINI_API_KEY is added in the Render dashboard
+      - key: UDI_AUTH
+        value: "off"
+      - key: UDI_DATA_DIR
+        value: /tmp/udi-data # free instances have no persistent disk: data resets on restart
+      - key: UDI_MAX_UPLOAD_MB
+        value: "20"
+      - key: UDI_SESSION_TTL_SECONDS
+        value: "7200"

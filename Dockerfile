@@ -7,7 +7,8 @@ COPY frontend/ ./
 RUN npm run build
 
 FROM python:3.13-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UDI_DATA_DIR=/data MPLBACKEND=Agg
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UDI_DATA_DIR=/data MPLBACKEND=Agg \
+    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 UDI_JOB_WORKERS=1 UDI_THREADS=4
 WORKDIR /app/backend
 COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -17,5 +18,6 @@ RUN rm -f .env && useradd -m udi && mkdir -p /data && chown -R udi /data /app
 USER udi
 VOLUME ["/data"]
 EXPOSE 5000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s CMD python -c "import urllib.request;urllib.request.urlopen('http://localhost:5000/api/health')" || exit 1
+RUN python train_planner.py > /dev/null
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s CMD python -c "import os,urllib.request;urllib.request.urlopen('http://localhost:%s/api/health' % os.getenv('PORT','5000'))" || exit 1
 CMD ["python", "serve.py"]
