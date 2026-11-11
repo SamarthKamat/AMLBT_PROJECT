@@ -21,6 +21,7 @@ try:                                                     # statsmodels is option
 except Exception:                                        # pragma: no cover
     HAVE_SM = False
 
+import config
 from context import ExecContext
 from diagnostics_engine import FREQ_ADJ, FREQ_NAME, PERIOD_ALIAS, aggregate_series, native_frequency, period_label
 from errors import UDIError
@@ -134,11 +135,11 @@ def _candidates(m: int, n: int) -> Dict[str, Callable]:
     c["Moving average"] = _moving_average
     c["Linear trend" + (" + seasonal profile" if m else "")] = _linear_trend
     c["Autoregressive Ridge (lags + trend)"] = _make_ar(lambda: make_pipeline(StandardScaler(), Ridge(alpha=1.0)))
-    c["Random Forest (lags)"] = _make_ar(lambda: RandomForestRegressor(n_estimators=200, min_samples_leaf=2, n_jobs=-1, random_state=42))
-    c["Gradient Boosting (lags)"] = _make_ar(lambda: GradientBoostingRegressor(n_estimators=150, max_depth=3, learning_rate=0.06, random_state=42))
+    c["Random Forest (lags)"] = _make_ar(lambda: RandomForestRegressor(n_estimators=50 if config.LITE else 200, min_samples_leaf=2, n_jobs=1 if config.LITE else -1, random_state=42))
+    c["Gradient Boosting (lags)"] = _make_ar(lambda: GradientBoostingRegressor(n_estimators=50 if config.LITE else 150, max_depth=3, learning_rate=0.06, random_state=42))
     if HAVE_SM and n >= MIN_PERIODS:
         c["Holt-Winters ETS (damped trend" + (" + seasonal)" if m else ")")] = _ets
-        if n <= 800:
+        if n <= 800 and not config.LITE:
             c["ARIMA / SARIMA (AIC-selected)" if m else "ARIMA (AIC-selected)"] = _arima
     return c
 

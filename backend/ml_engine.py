@@ -37,6 +37,7 @@ try:                                    # XGBoost is optional ("if available")
 except Exception:                       # pragma: no cover
     HAVE_XGB = False
 
+import config
 from context import MODEL_CONFIG_VERSION, ExecContext
 from explainability_engine import global_explanation, local_explanation, model_predictor, waterfall_chart
 from errors import UDIError
@@ -45,10 +46,10 @@ from preprocessing import build_preprocessor, near_duplicate_of_target, prepare_
 from result_formatter import fmt_num, make_result, records
 from validator import ValidatedPlan
 
-SELECTION_ROWS = 20000      # model selection is run on at most this many rows
+SELECTION_ROWS = 3000 if config.LITE else 20000      # model selection is run on at most this many rows
 MAX_FIT_ROWS = 200000       # final refit cap
 TEST_SIZE = 0.2
-IMPORTANCE_ROWS = 1500
+IMPORTANCE_ROWS = 300 if config.LITE else 1500
 TREE_FAMILY = ("Decision Tree", "Random Forest", "Gradient Boosting", "XGBoost")
 CAUSAL_NOTE = "Model-based estimates describe statistical relationships in the uploaded data; they do not establish causal effects."
 
@@ -80,11 +81,11 @@ def _regressors(n: int) -> Dict[str, Any]:
     c = {
         "Linear Regression": LinearRegression(),
         "Decision Tree Regressor": DecisionTreeRegressor(max_depth=8, min_samples_leaf=5, random_state=42),
-        "Random Forest Regressor": RandomForestRegressor(n_estimators=200, min_samples_leaf=2, n_jobs=-1, random_state=42),
-        "Gradient Boosting Regressor": GradientBoostingRegressor(n_estimators=200, max_depth=3, learning_rate=0.05, subsample=0.9, random_state=42),
+        "Random Forest Regressor": RandomForestRegressor(n_estimators=60 if config.LITE else 200, min_samples_leaf=2, n_jobs=1 if config.LITE else -1, random_state=42),
+        "Gradient Boosting Regressor": GradientBoostingRegressor(n_estimators=60 if config.LITE else 200, max_depth=3, learning_rate=0.05, subsample=0.9, random_state=42),
     }
     if HAVE_XGB:
-        c["XGBoost Regressor"] = XGBRegressor(n_estimators=250, max_depth=4, learning_rate=0.05, subsample=0.9, colsample_bytree=0.9,
+        c["XGBoost Regressor"] = XGBRegressor(n_estimators=80 if config.LITE else 250, max_depth=4, learning_rate=0.05, subsample=0.9, colsample_bytree=0.9,
                                               objective="reg:squarederror", n_jobs=2, random_state=42, verbosity=0)
     return c
 
@@ -93,11 +94,11 @@ def _classifiers(n_classes: int) -> Dict[str, Any]:
     c = {
         "Logistic Regression": LogisticRegression(max_iter=2000, class_weight="balanced"),
         "Decision Tree Classifier": DecisionTreeClassifier(max_depth=8, min_samples_leaf=5, class_weight="balanced", random_state=42),
-        "Random Forest Classifier": RandomForestClassifier(n_estimators=200, min_samples_leaf=2, class_weight="balanced_subsample", n_jobs=-1, random_state=42),
-        "Gradient Boosting Classifier": GradientBoostingClassifier(n_estimators=150, max_depth=3, learning_rate=0.08, random_state=42),
+        "Random Forest Classifier": RandomForestClassifier(n_estimators=60 if config.LITE else 200, min_samples_leaf=2, class_weight="balanced_subsample", n_jobs=1 if config.LITE else -1, random_state=42),
+        "Gradient Boosting Classifier": GradientBoostingClassifier(n_estimators=60 if config.LITE else 150, max_depth=3, learning_rate=0.08, random_state=42),
     }
     if HAVE_XGB:
-        c["XGBoost Classifier"] = XGBClassifier(n_estimators=200, max_depth=4, learning_rate=0.06, subsample=0.9, colsample_bytree=0.9,
+        c["XGBoost Classifier"] = XGBClassifier(n_estimators=80 if config.LITE else 200, max_depth=4, learning_rate=0.06, subsample=0.9, colsample_bytree=0.9,
                                                 eval_metric="logloss" if n_classes == 2 else "mlogloss", n_jobs=2, random_state=42, verbosity=0)
     return c
 
@@ -109,7 +110,7 @@ def _permutation_importance(pipe, Xte: pd.DataFrame, yte, scoring: str, seed: in
         Xte, yte = Xte.iloc[idx], np.asarray(yte)[idx]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        res = permutation_importance(pipe, Xte, yte, scoring=scoring, n_repeats=3, random_state=seed, n_jobs=1)
+        res = permutation_importance(pipe, Xte, yte, scoring=scoring, n_repeats=2 if config.LITE else 3, random_state=seed, n_jobs=1)
     pos = np.clip(res.importances_mean, 0, None)
     total = pos.sum()
     items = [{"feature": f, "importance": float(m), "std": float(s), "share_%": float(max(m, 0) / total * 100) if total > 0 else 0.0}
@@ -145,9 +146,10 @@ def _cache_key(task: str, vp: ValidatedPlan, ctx: ExecContext, feats: List[str])
 COMPLEXITY = {"Linear Regression": 1, "Logistic Regression": 1, "Decision Tree Regressor": 2, "Decision Tree Classifier": 2,
               "Random Forest Regressor": 3, "Random Forest Classifier": 3, "Gradient Boosting Regressor": 4,
               "Gradient Boosting Classifier": 4, "XGBoost Regressor": 5, "XGBoost Classifier": 5}
-TUNE_MAX_ROWS = 3000
-LARGE_TRAIN = 3000          # above this many training rows, selection uses 3-fold instead of 5-fold CV
+TUNE_MAX_ROWS = 0 if config.LITE else 3000
+LARGE_TRAIN = 0 if config.LITE else 3000          # above this many training rows, selection uses 3-fold instead of 5-fold CV
 CURVE_MAX_ROWS = 2000
+SKIP_CURVE = config.LITE
 TUNE_ITER = 5
 TUNING_GRIDS = {
     "Random Forest": {"model__n_estimators": [100, 200], "model__max_depth": [None, 6, 12], "model__min_samples_leaf": [1, 2, 5]},
@@ -196,7 +198,7 @@ def _tune(pipe, name: str, Xtr, ytr, scoring: str, cv, seed: int) -> Optional[Di
     """Randomised search over a small grid, scored with 3-fold CV. The tuned model is adopted only if it beats the
     default model's 3-fold score (compared on the same folds)."""
     family = next((f for f in TUNING_GRIDS if name.startswith(f)), None)
-    if family is None or len(Xtr) > TUNE_MAX_ROWS or len(Xtr) < 60:
+    if family is None or len(Xtr) > TUNE_MAX_ROWS or len(Xtr) < 60 or config.LITE:
         return None
     cv3 = _cv3(cv, seed)
     with warnings.catch_warnings():
@@ -209,6 +211,8 @@ def _tune(pipe, name: str, Xtr, ytr, scoring: str, cv, seed: int) -> Optional[Di
 
 
 def _learning_curve(pipe, X, y, scoring: str, cv, seed: int, higher_better: bool) -> List[Dict[str, Any]]:
+    if SKIP_CURVE:
+        return []
     if len(X) > CURVE_MAX_ROWS:
         idx = np.random.RandomState(seed).choice(len(X), CURVE_MAX_ROWS, replace=False)
         X, y = X.iloc[idx], np.asarray(y)[idx]

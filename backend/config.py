@@ -30,7 +30,7 @@ GEMINI_SAMPLE_ROWS = int(os.getenv("GEMINI_SAMPLE_ROWS", "3"))
 PLANNER_MODE = os.getenv("UDI_PLANNER", "auto").strip().lower()
 
 # --- Server ----------------------------------------------------------------
-PORT = int(os.getenv("FLASK_PORT", "5000"))
+PORT = int(os.getenv("PORT") or os.getenv("FLASK_PORT", "5000"))      # PORT is set by hosting platforms (Render)
 MAX_UPLOAD_MB = int(os.getenv("UDI_MAX_UPLOAD_MB", "50"))
 SESSION_TTL_SECONDS = int(os.getenv("UDI_SESSION_TTL_SECONDS", str(6 * 3600)))
 MAX_SESSIONS = int(os.getenv("UDI_MAX_SESSIONS", "25"))
@@ -44,6 +44,9 @@ RATE_LIMITS = {"chat": int(os.getenv("UDI_RATE_CHAT", "40")), "upload": int(os.g
 JOB_WORKERS = int(os.getenv("UDI_JOB_WORKERS", "2"))
 CORS_ORIGINS = os.getenv("UDI_CORS_ORIGINS", "*")
 VERSION = "2.0.0"
+# Lite compute mode for very small hosts (e.g. Render free tier, ~0.1 CPU): fewer / smaller candidate models,
+# no hyperparameter search or learning curve, smaller SHAP samples, no ARIMA. Results stay valid but less tuned.
+LITE = _bool("UDI_LITE", False)
 
 # --- Paths -----------------------------------------------------------------
 SAMPLE_DIR = BASE_DIR / "sample_data"
