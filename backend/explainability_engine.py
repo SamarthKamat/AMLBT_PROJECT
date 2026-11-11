@@ -20,9 +20,11 @@ from typing import Any, Callable, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-GLOBAL_ROWS = 60
-GLOBAL_PERMS = 10          # antithetic pairs -> 20 orderings per row
-LOCAL_PERMS = 40
+import config
+
+GLOBAL_ROWS = 20 if config.LITE else 60
+GLOBAL_PERMS = 4 if config.LITE else 10          # antithetic pairs -> 20 orderings per row
+LOCAL_PERMS = 12 if config.LITE else 40
 MAX_BATCH_ROWS = 60000
 
 

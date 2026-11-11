@@ -44,6 +44,9 @@ RATE_LIMITS = {"chat": int(os.getenv("UDI_RATE_CHAT", "40")), "upload": int(os.g
 JOB_WORKERS = int(os.getenv("UDI_JOB_WORKERS", "2"))
 CORS_ORIGINS = os.getenv("UDI_CORS_ORIGINS", "*")
 VERSION = "2.0.0"
+# Lite compute mode for very small hosts (e.g. Render free tier, ~0.1 CPU): fewer / smaller candidate models,
+# no hyperparameter search or learning curve, smaller SHAP samples, no ARIMA. Results stay valid but less tuned.
+LITE = _bool("UDI_LITE", False)
 
 # --- Paths -----------------------------------------------------------------
 SAMPLE_DIR = BASE_DIR / "sample_data"

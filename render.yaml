@@ -6,11 +6,12 @@ services:
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /api/health
     autoDeploy: true
     envVars:
       - key: UDI_PLANNER
         value: auto          # local planner unless GEMINI_API_KEY is added in the Render dashboard
+      - key: UDI_LITE
+        value: "1"           # small free instance: lighter AutoML (see config.LITE)
       - key: UDI_AUTH
         value: "off"
       - key: UDI_DATA_DIR
