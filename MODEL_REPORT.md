@@ -8,7 +8,8 @@ Produced by `python evaluation/run_real_datasets.py` (seed 42; full numbers in `
 | Global Superstore / Profit | Random Forest (one-SE rule over GBM; tuned) | RMSE 395.7 ± 43.3 | R² 0.707, RMSE 290.4 | RMSE 536.2 | Discount, Sales, Shipping Cost |
 | IBM HR / Attrition | XGBoost | macro-F1 0.718 ± 0.042 | F1 0.636, ROC-AUC 0.796, PR-AUC 0.504 | acc. 0.840 | OverTime, MonthlyIncome, Age |
 | IBM Telco / Churn | Random Forest | macro-F1 0.734 ± 0.012 | F1 0.728, ROC-AUC 0.834, PR-AUC 0.640 | acc. 0.735 | Contract, InternetService, tenure |
-| UCI Bank / y | Random Forest | macro-F1 0.782 ± 0.011 | F1 0.793, ROC-AUC 0.944, PR-AUC 0.661 | acc. 0.888 | duration, emp.var.rate, nr.employed |
+| UCI Bank / y — all columns (**leaky**: call duration is known only after the call) | Random Forest | macro-F1 0.782 ± 0.011 | F1 0.793, ROC-AUC 0.944 | acc. 0.888 | duration 34% (dominance warning) |
+| **UCI Bank / y — pre-call, without duration (reported result)** | Random Forest | macro-F1 0.700 ± 0.013 | F1 0.720 [0.697, 0.741], ROC-AUC 0.798 [0.772, 0.824], PR-AUC 0.455 | acc. 0.888 | emp.var.rate, nr.employed, contact |
 
 Local planner intent model: TF-IDF (word 1–3 + char 2–5 grams) + logistic regression, 1,658 templated training questions, 19 classes, in-corpus 5-fold CV accuracy 0.963 ± 0.011 (`backend/models/planner/training_report.json`). Its real evaluation is the held-out benchmark (README §6).
 

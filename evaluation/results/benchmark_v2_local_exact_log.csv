@@ -1,0 +1,100 @@
+id,dataset,question,gold_op,planned_op,gold_target,planned_target,gold_group,planned_group,status,seconds,intent_ok,columns_ok,filters_ok,rejection_ok,answered,numeric_ok,oracle,returned,pass
+v2-college-01,college,Which department records the best average attendance?,compare_groups,compare_groups,Attendance,Attendance,Department,Department,answer,0.04,True,True,,,True,True,Computer,Computer,True
+v2-college-02,college,Mean classroom utilization overall,get_summary,get_summary,Classroom_Utilization,Classroom_Utilization,,,answer,0.01,True,True,,,True,True,0.7019633333333334,0.7019633333333334,True
+v2-college-03,college,How has attendance moved over the months?,analyze_trend,analyze_trend,Attendance,Attendance,,,answer,0.01,True,True,,,True,,,,True
+v2-college-04,college,Project student count for the coming 4 weeks,forecast,forecast,Student_Count,Student_Count,,,answer,1.77,True,True,,,True,,,,True
+v2-college-05,college,Which department employs the fewest faculty in total?,compare_groups,compare_groups,Faculty_Count,total,Department,Department,INVALID_COLUMN,0.01,True,False,,,False,False,,,False
+v2-college-06,college,Can we predict attendance risk?,predict_class,predict_class,Attendance_Risk,Attendance_Risk,,,answer,4.65,True,True,,,True,,,,True
+v2-college-07,college,Flag odd classroom utilization values,detect_anomalies,detect_anomalies,Classroom_Utilization,Classroom_Utilization,,,answer,0.2,True,True,,,True,,,,True
+v2-college-08,college,Which variables move together with attendance?,calculate_correlation,calculate_correlation,Attendance,Attendance,,,answer,0.02,True,True,,,True,,,,True
+v2-college-09,college,Average student count in the Commerce department,get_summary,get_summary,Student_Count,Student_Count,,,answer,0.01,True,True,True,,True,True,517.6386554621848,517.6386554621848,True
+v2-college-10,college,What was the attendance on the most recent day?,get_current_state,get_current_state,Attendance,Attendance,,,answer,0.01,True,True,,,True,,,,True
+v2-college-11,college,What is the average tuition fee?,get_summary,get_summary,,tuition fee,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v2-college-12,college,Put together a report for the operations team,generate_report,generate_report,,,,,answer,7.79,True,,,,True,,,,True
+v2-municipality-01,municipality,Which zone collects the most waste overall?,compare_groups,compare_groups,Waste_Collected,,Zone,Zone,answer,0.01,True,False,,,True,True,East,East,False
+v2-municipality-02,municipality,Total complaints received,get_summary,get_summary,Complaints,Complaints,,,answer,0.01,True,True,,,True,True,25757.45,25757.45,True
+v2-municipality-03,municipality,Are complaints going up over time?,analyze_trend,analyze_trend,Complaints,Complaints,,,answer,0.01,True,True,,,True,,,,True
+v2-municipality-04,municipality,Predict waste collected for the next 2 weeks,forecast,forecast,Waste_Collected,Waste_Collected,,,answer,1.35,True,True,,,True,,,,True
+v2-municipality-05,municipality,Which records have abnormal complaint counts?,detect_anomalies,detect_anomalies,Complaints,,,,answer,0.31,True,False,,,True,,,,False
+v2-municipality-06,municipality,Why did waste collection change last month?,explain_change,explain_change,Waste_Collected,,,,answer,0.01,True,False,,,True,,,,False
+v2-municipality-07,municipality,If workers increased by 10 percent what would complaints be?,run_scenario,run_scenario,Complaints,Complaints,,,answer,2.7,True,True,,,True,,,,True
+v2-municipality-08,municipality,Number of workers by zone,compare_groups,compare_groups,Workers,Workers,Zone,Zone,answer,0.01,True,True,,,True,,,,True
+v2-municipality-09,municipality,What predicts service risk?,predict_class,predict_class,Service_Risk,Service_Risk,,,answer,5.55,True,True,,,True,,,,True
+v2-municipality-10,municipality,Assess how clean the data is,assess_data_quality,assess_data_quality,,,,,answer,0.01,True,,,,True,,,,True
+v2-municipality-11,municipality,How many garbage trucks are deployed?,get_summary,get_summary,,,,,answer,0.01,True,,,False,,,,,False
+v2-municipality-12,municipality,Lowest average population index zone,compare_groups,compare_groups,Population_Index,Population_Index,Zone,Zone,answer,0.02,True,True,,,True,True,South,South,True
+v2-ngo-01,ngo,Which district received the largest donations?,compare_groups,compare_groups,Donations,Donations,District,District,answer,0.02,True,True,,,True,True,East,East,True
+v2-ngo-02,ngo,What's the mean number of beneficiaries?,get_summary,get_summary,Beneficiaries,Beneficiaries,,,answer,0.01,True,True,,,True,True,219.2898888888889,219.2898888888889,True
+v2-ngo-03,ngo,How do donations relate to aid distributed?,calculate_correlation,calculate_correlation,Donations,Donations,,,answer,0.02,True,True,,,True,,,,True
+v2-ngo-04,ngo,Forecast donations for the next 3 months,forecast,forecast,Donations,Donations,,,answer,1.42,True,True,,,True,,,,True
+v2-ngo-05,ngo,Will coverage be at risk?,predict_class,predict_class,Coverage_Risk,Coverage_Risk,,,answer,6.46,True,True,,,True,,,,True
+v2-ngo-06,ngo,Show the 5 days with the most aid distributed,query_records,query_records,Aid_Distributed,Aid_Distributed,,,answer,0.01,True,True,,,True,,,,True
+v2-ngo-07,ngo,Total volunteers in the North district,get_summary,get_summary,Volunteers,Volunteers,,,answer,0.01,True,True,True,,True,True,2301.0,2301.0,True
+v2-ngo-08,ngo,Split the records into clusters,segment_records,segment_records,,,,,answer,0.73,True,,,,True,,,,True
+v2-ngo-09,ngo,Donations by district and coverage risk,pivot_table,pivot_table,Donations,Donations,District,District,answer,0.01,True,True,,,True,,,,True
+v2-ngo-10,ngo,What is the average volunteer age?,get_summary,get_summary,,volunteer age,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v2-ngo-11,ngo,Make a finance report,generate_report,generate_report,,,,,answer,8.95,True,,,,True,,,,True
+v2-community-01,community,Which area files the most resource requests?,compare_groups,compare_groups,Resource_Requests,Resource_Requests,Area,Area,answer,0.01,True,True,,,True,True,Area A,Area A,True
+v2-community-02,community,Median participation,get_summary,get_summary,Participation,,,,clarification,0.0,True,False,,,False,False,,,False
+v2-community-03,community,Is participation declining?,analyze_trend,analyze_trend,Participation,Participation,,,answer,0.01,True,True,,,True,,,,True
+v2-community-04,community,Find outliers in shortage count,detect_anomalies,detect_anomalies,Shortage_Count,Shortage_Count,,,answer,0.17,True,True,,,True,,,,True
+v2-community-05,community,Estimate resource requests for a population index of 1.5,predict_value,predict_value,Resource_Requests,Resource_Requests,,,answer,2.98,True,True,,,True,,,,True
+v2-community-06,community,What is linked to shortage risk?,calculate_correlation,calculate_correlation,Shortage_Risk,Shortage_Risk,,,answer,0.01,True,True,,,True,,,,True
+v2-community-07,community,Show how the variables relate,describe_relationships,describe_relationships,,,,,answer,0.01,True,,,,True,,,,True
+v2-community-08,community,Explore the dataset thoroughly,run_eda,run_eda,,,,,answer,0.02,True,,,,True,,,,True
+v2-community-09,community,Average participation per area,compare_groups,compare_groups,Participation,Participation,Area,Area,answer,0.01,True,True,,,True,True,Area B,Area B,True
+v2-community-10,community,Please order lunch for the volunteers,unsupported,unsupported,,,,,UNSUPPORTED_OPERATION,0.0,True,,,True,,,,,True
+v2-event-01,event,Which event type brings in the most revenue?,compare_groups,compare_groups,Revenue,Revenue,Event,Event,answer,0.01,True,True,,,True,True,Tech Summit,Tech Summit,True
+v2-event-02,event,What is the average attendance per event?,get_summary,get_summary,Attendance,Attendance,,,answer,0.01,True,True,,,True,True,720.2124444444444,720.2124444444444,True
+v2-event-03,event,Forecast registrations for the next 10 days,forecast,forecast,Registrations,Registrations,,,answer,2.69,True,True,,,True,,,,True
+v2-event-04,event,Predict capacity risk for upcoming events,predict_class,predict_class,Capacity_Risk,Capacity_Risk,,,answer,5.06,True,True,,,True,,,,True
+v2-event-05,event,What happens to attendance if capacity is cut by 15%?,run_scenario,run_scenario,Attendance,Attendance,,,clarification,0.01,True,True,,,False,,,,False
+v2-event-06,event,Highest maximum revenue event,compare_groups,compare_groups,Revenue,Revenue,Event,Event,answer,0.01,True,True,,,True,,,,True
+v2-event-07,event,Revenue by event as a pie chart,compare_groups,compare_groups,Revenue,Revenue,Event,Event,answer,0.01,True,True,,,True,,,,True
+v2-event-08,event,Any events with suspicious revenue?,detect_anomalies,detect_anomalies,Revenue,Revenue,,,answer,0.17,True,True,,,True,,,,True
+v2-event-09,event,Why did revenue drop last month?,explain_change,explain_change,Revenue,Revenue,,,answer,0.01,True,True,,,True,,,,True
+v2-event-10,event,What is the average ticket price?,get_summary,get_summary,,ticket price,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v2-event-11,event,Give me an operations report,generate_report,generate_report,,,,,answer,9.52,True,,,,True,,,,True
+v2-superstore-01,superstore,In which region did we earn the highest profit?,compare_groups,compare_groups,Profit,Profit,Region,Region,answer,0.02,True,True,,,True,True,Eastern Asia,Eastern Asia,True
+v2-superstore-02,superstore,Average quantity per order,get_summary,get_summary,Quantity,Quantity,,,answer,0.01,True,True,,,True,True,5.558,5.558,True
+v2-superstore-03,superstore,Total shipping cost in the Africa market,get_summary,get_summary,Shipping Cost,Shipping Cost,,,answer,0.01,True,True,True,,True,True,18756.88,18756.88,True
+v2-superstore-04,superstore,Which segment has the lowest average discount?,compare_groups,compare_groups,Discount,Discount,Segment,Segment,answer,0.01,True,True,,,True,True,Consumer,Consumer,True
+v2-superstore-05,superstore,How has sales changed month by month?,analyze_trend,analyze_trend,Sales,Sales,,,answer,0.01,True,True,,,True,,,,True
+v2-superstore-06,superstore,Forecast profit for the next quarter,forecast,forecast,Profit,Profit,,,answer,2.84,True,True,,,True,,,,True
+v2-superstore-07,superstore,Which orders have unusual profit?,detect_anomalies,detect_anomalies,Profit,Profit,,,answer,0.17,True,True,,,True,,,,True
+v2-superstore-08,superstore,Predict shipping cost,predict_value,predict_value,Shipping Cost,Shipping Cost,,,answer,13.87,True,True,,,True,,,,True
+v2-superstore-09,superstore,Quantity by category and segment,pivot_table,pivot_table,Quantity,Quantity,Category,Category,answer,0.01,True,True,,,True,,,,True
+v2-superstore-10,superstore,Which ship mode is used most often?,compare_groups,compare_groups,,,Ship Mode,Ship Mode,answer,0.01,True,True,,,True,True,Standard Class,Standard Class,True
+v2-superstore-11,superstore,What is the average delivery rating?,get_summary,get_summary,,delivery rating,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v2-superstore-12,superstore,List the 3 most profitable orders in China,query_records,query_records,Profit,,,,answer,0.01,True,False,True,,True,,,,False
+v2-hr-01,hr,Which job role earns the highest average monthly income?,compare_groups,compare_groups,MonthlyIncome,MonthlyIncome,JobRole,JobRole,answer,0.02,True,True,,,True,True,Manager,Manager,True
+v2-hr-02,hr,What share of employees left?,get_summary,get_summary,Attrition,,,,answer,0.02,True,False,,,True,,,,False
+v2-hr-03,hr,Average years at company by department,compare_groups,compare_groups,YearsAtCompany,YearsAtCompany,Department,Department,answer,0.01,True,True,,,True,True,Sales,Sales,True
+v2-hr-04,hr,Average distance from home,get_summary,get_summary,DistanceFromHome,DistanceFromHome,,,answer,0.01,True,True,,,True,True,9.19251700680272,9.19251700680272,True
+v2-hr-05,hr,Which marital status has the highest attrition rate?,compare_groups,compare_groups,Attrition,Attrition,MaritalStatus,MaritalStatus,answer,0.01,True,True,,,True,True,Single,Single,True
+v2-hr-06,hr,Predict attrition without monthly income,predict_class,predict_class,Attrition,Attrition,,,answer,17.34,True,True,,,True,,,,True
+v2-hr-07,hr,Cluster the workforce,segment_records,segment_records,,,,,answer,0.8,True,,,,True,,,,True
+v2-hr-08,hr,Show female employees with total working years above 30,query_records,query_records,,,,,answer,0.01,True,,True,,True,,,,True
+v2-hr-09,hr,What correlates with job satisfaction?,calculate_correlation,calculate_correlation,JobSatisfaction,JobSatisfaction,,,answer,0.07,True,True,,,True,,,,True
+v2-hr-10,hr,Average performance bonus,get_summary,get_summary,,performance bonus,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v2-hr-11,hr,Is attrition rising over time?,analyze_trend,compare_groups,,,,Attrition,answer,0.01,False,,,False,,,,,False
+v2-telco-01,telco,Which payment method has the highest churn rate?,compare_groups,compare_groups,Churn,Churn,PaymentMethod,PaymentMethod,answer,0.03,True,True,,,True,True,Electronic check,Electronic check,True
+v2-telco-02,telco,Average total charges,get_summary,get_summary,TotalCharges,TotalCharges,,,answer,0.01,True,True,,,True,True,2283.300440841866,2283.300440841866,True
+v2-telco-03,telco,Monthly charges by internet service,compare_groups,compare_groups,MonthlyCharges,MonthlyCharges,InternetService,InternetService,answer,0.02,True,True,,,True,,,,True
+v2-telco-04,telco,How many customers are there?,get_summary,get_summary,,,,,answer,0.01,True,,,,True,True,7043.0,7043,True
+v2-telco-05,telco,Churn split,get_summary,pivot_table,Churn,,,Churn,clarification,0.0,False,False,,,False,,,,False
+v2-telco-06,telco,Which customers look like outliers on tenure?,detect_anomalies,detect_anomalies,tenure,tenure,,,answer,0.34,True,True,,,True,,,,True
+v2-telco-07,telco,Can you build a model for churn?,predict_class,predict_value,Churn,build,,,INVALID_COLUMN,0.01,False,False,,,False,,,,False
+v2-telco-08,telco,Assess data quality,assess_data_quality,assess_data_quality,,,,,answer,0.01,True,,,,True,,,,True
+v2-telco-09,telco,Show me senior citizens with monthly charges above 100,query_records,query_records,,,,,answer,0.01,True,,,,True,,,,True
+v2-telco-10,telco,What is the average data usage in GB?,get_summary,get_summary,,usage,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v2-bank-01,bank,Which education level has the highest subscription rate?,compare_groups,compare_groups,y,y,education,education,answer,0.07,True,True,,,True,True,illiterate,illiterate,True
+v2-bank-02,bank,Average number of previous contacts,get_summary,get_summary,previous,previous,,,answer,0.02,True,True,,,True,True,0.17296299893172767,0.17296299893172767,True
+v2-bank-03,bank,Predict subscription without duration,predict_class,predict_value,y,subscription without,,,INVALID_COLUMN,0.0,False,False,,,False,,,,False
+v2-bank-04,bank,Average age by job,compare_groups,compare_groups,age,age,job,job,answer,0.03,True,True,,,True,True,retired,retired,True
+v2-bank-05,bank,Which month had the most calls?,compare_groups,compare_groups,,,month,month,answer,0.02,True,True,,,True,True,may,may,True
+v2-bank-06,bank,Average campaign contacts for married clients,get_summary,get_summary,campaign,campaign,,,answer,0.02,True,True,True,,True,True,2.572809691912709,2.572809691912709,True
+v2-bank-07,bank,What relates to the employment variation rate?,calculate_correlation,calculate_correlation,emp.var.rate,,,,answer,0.14,True,False,,,True,,,,False
+v2-bank-08,bank,Cluster the clients,segment_records,segment_records,,,,,answer,2.12,True,,,,True,,,,True
+v2-bank-09,bank,What is the average account balance?,get_summary,get_summary,,account balance,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v2-bank-10,bank,Send this analysis to my boss by email,unsupported,unsupported,,,,,UNSUPPORTED_OPERATION,0.0,True,,,True,,,,,True

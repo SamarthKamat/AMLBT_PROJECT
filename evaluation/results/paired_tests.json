@@ -1,0 +1,22 @@
+{
+  "v1_full_vs_keyword": {
+    "full_only": 48,
+    "other_only": 1,
+    "mcnemar_exact_p": 1.7763568394002505e-13
+  },
+  "v1_full_vs_local_exact": {
+    "full_only": 7,
+    "other_only": 0,
+    "mcnemar_exact_p": 0.015625
+  },
+  "v2_full_vs_keyword": {
+    "full_only": 44,
+    "other_only": 5,
+    "mcnemar_exact_p": 7.59715845788378e-09
+  },
+  "v2_full_vs_local_exact": {
+    "full_only": 6,
+    "other_only": 4,
+    "mcnemar_exact_p": 0.75390625
+  }
+}

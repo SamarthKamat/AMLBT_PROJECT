@@ -285,3 +285,28 @@ def test_auth_ownership_and_rate_limit():
     with pytest.raises(UDIError) as e:
         rl.check("u", "chat")
     assert e.value.code == "RATE_LIMITED"
+
+
+# ----------------------------------------------------------------------------- second-review additions
+def test_exclude_columns_removes_feature_and_planner_parses_without(delivery):
+    df, prof, roles, ctx = delivery
+    res = execute(validate_plan(AnalysisPlan(operation="predict_value", target_column="Delivery_Time", exclude_columns=["Distance"]), df, prof, roles), ctx)
+    assert "Distance" not in res["evaluation"]["features_used"]
+    assert any(e["column"] == "Distance" and "request" in e["reason"] for e in res["evaluation"]["features_excluded"])
+    plan, _ = LocalPlanner().plan_question("Predict delivery time without distance", df, prof, infer_semantics(df, prof))
+    assert plan.operation == "predict_value" and plan.exclude_columns == ["Distance"]
+
+
+def test_dominant_feature_warning(delivery):
+    df, prof, roles, ctx = delivery
+    res = execute(validate_plan(AnalysisPlan(operation="predict_value", target_column="Delivery_Time"), df, prof, roles), ctx)
+    top = res["explainability"]["shap"]["items"][0]
+    warned = any("carries" in l and top["feature"] in l for l in res["limitations"])
+    assert warned == (top["share_%"] >= 30)
+
+
+def test_unknown_exclusion_is_rejected(delivery):
+    df, prof, roles, ctx = delivery
+    with pytest.raises(UDIError) as e:
+        validate_plan(AnalysisPlan(operation="predict_value", target_column="Delivery_Time", exclude_columns=["Mileage"]), df, prof, roles)
+    assert e.value.code == "INVALID_COLUMN"

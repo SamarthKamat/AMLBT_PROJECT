@@ -4,9 +4,11 @@ All files are public datasets, redistributed unchanged (CSV) for reproducibility
 
 | File | Dataset | Original source | Mirror used | Rows × cols | Used for |
 |---|---|---|---|---|---|
-| `global_superstore_sample.csv` | Global Superstore (1,000-order extract) | Tableau "Global Superstore" sample data | github.com/yannie28/Global-Superstore | 1,000 × 24 | sales, operations, finance; forecasting; country-level questions |
+| `global_superstore_sample.csv` | Global Superstore (1,000-order extract; see note) | Tableau "Global Superstore" sample data | github.com/yannie28/Global-Superstore | 1,000 × 24 | sales, operations, finance; forecasting; country-level questions |
 | `ibm_hr_attrition.csv` | IBM HR Analytics Employee Attrition & Performance | IBM (fictional data created by IBM data scientists) | github.com/IBM/employee-attrition-aif360 | 1,470 × 35 | HR reports, attrition classification |
 | `ibm_telco_churn.csv` | IBM Telco Customer Churn | IBM sample data | github.com/IBM/telco-customer-churn-on-icp4d | 7,043 × 21 | marketing / customer reports, churn classification; contains blank `TotalCharges` (real missingness) |
 | `uci_bank_marketing.csv` | Bank Marketing (bank-additional-full) | S. Moro, P. Cortez, P. Rita (2014), UCI Machine Learning Repository | github.com/selva86/datasets | 41,188 × 21 | marketing reports, subscription classification; 'unknown' categories |
 
 Note: the IBM HR dataset is itself a simulated dataset published by IBM; it is treated as a public benchmark, not as observations of a real company.
+
+Note on the Global Superstore extract: the file is used exactly as published by the mirror. The mirror does not document how its 1,000 rows were selected. Their `Row ID`s range from 58 to 51,284 (non-contiguous) and cover all five markets and all four years (2012–2015), which is consistent with a random sample of the 51,290-row original, but this cannot be verified.

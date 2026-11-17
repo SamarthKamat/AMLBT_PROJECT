@@ -41,11 +41,49 @@ from validator import roles_from_profile, validate_plan  # noqa: E402
 
 OUT = ROOT / "evaluation" / "results"
 REAL = {
-    "Global Superstore": ("backend/sample_data/real/global_superstore_sample.csv", "Profit", "predict_value"),
-    "IBM HR Attrition": ("backend/sample_data/real/ibm_hr_attrition.csv", "Attrition", "predict_class"),
-    "IBM Telco Churn": ("backend/sample_data/real/ibm_telco_churn.csv", "Churn", "predict_class"),
-    "UCI Bank Marketing": ("backend/sample_data/real/uci_bank_marketing.csv", "y", "predict_class"),
+    "Global Superstore": ("backend/sample_data/real/global_superstore_sample.csv", "Profit", "predict_value", None),
+    "IBM HR Attrition": ("backend/sample_data/real/ibm_hr_attrition.csv", "Attrition", "predict_class", None),
+    "IBM Telco Churn": ("backend/sample_data/real/ibm_telco_churn.csv", "Churn", "predict_class", None),
+    "UCI Bank Marketing (all columns)": ("backend/sample_data/real/uci_bank_marketing.csv", "y", "predict_class", None),
+    # call duration is only known after the call (Moro et al. 2014): the realistic pre-call model must exclude it
+    "UCI Bank Marketing (pre-call, without duration)": ("backend/sample_data/real/uci_bank_marketing.csv", "y", "predict_class", ["duration"]),
 }
+N_BOOT = 1000
+
+
+def bootstrap_ci(ctx, task):
+    """95% percentile-bootstrap CIs of the held-out metrics, from the cached trained model's hold-out rows."""
+    from sklearn.metrics import average_precision_score, f1_score, r2_score, roc_auc_score
+    m = list(ctx.cache._d.values())[-1]
+    idx = m.holdout.index
+    X = m.X_reference.loc[idx]
+    rng = np.random.default_rng(42)
+    n = len(idx)
+    stats = {}
+    if task == "predict_value":
+        y = m.holdout["actual"].to_numpy()
+        pr = m.eval_pipeline.predict(X)
+        fns = {"R2": lambda a, b: r2_score(a, b)}
+        pairs = (y, pr)
+    else:
+        y = m.encoder.transform(m.holdout["actual"].astype(str))
+        proba = m.eval_pipeline.predict_proba(X)
+        pred = proba.argmax(axis=1)
+        pos = m.explain_index if m.explain_index is not None else 1
+        fns = {"F1": lambda a, b: f1_score(a, b.argmax(axis=1), average="macro", zero_division=0),
+               "ROC_AUC": lambda a, b: roc_auc_score(a == pos, b[:, pos]),
+               "PR_AUC": lambda a, b: average_precision_score(a == pos, b[:, pos])}
+        pairs = (y, proba)
+    for k, fn in fns.items():
+        vals = []
+        for _ in range(N_BOOT):
+            b = rng.integers(0, n, n)
+            try:
+                vals.append(fn(pairs[0][b], pairs[1][b]))
+            except ValueError:
+                continue
+        stats[k] = {"point": float(fn(*pairs)), "ci95": [float(np.percentile(vals, 2.5)), float(np.percentile(vals, 97.5))]}
+    return stats
 
 
 def ctx_for(df, name):
@@ -70,7 +108,7 @@ def model_summary(res):
 
 def real_datasets():
     rows = {}
-    for name, (path, target, op) in REAL.items():
+    for name, (path, target, op, exclude) in REAL.items():
         t0 = time.time()
         df = load_dataset(ROOT / path)
         p, r, ctx = ctx_for(df, name)
@@ -80,12 +118,17 @@ def real_datasets():
         rel = analyse_relationships(df, p, ctx.semantics)
         t_rel = time.time() - t1
         t2 = time.time()
-        res = run(df, p, r, ctx, {"operation": op, "target_column": target})
+        plan = {"operation": op, "target_column": target}
+        if exclude:
+            plan["exclude_columns"] = exclude
+        res = run(df, p, r, ctx, plan)
         t_ml = time.time() - t2
+        boot = bootstrap_ci(ctx, op)
         rows[name] = {"rows": len(df), "columns": df.shape[1], "missing_cells": int(df.isna().sum().sum()), "quality_score": round(q["score"], 1), "grade": q["grade"],
                       "issues": len(q["issues"]), "strong_pairs": sum(1 for x in rel["association"]["pairs"] if x["strength"] >= 0.5),
                       "hierarchies": len(rel["hierarchies"]), "derived": [f["formula"] for f in rel["derived"]], "keys": rel["candidate_keys"],
-                      "target": target, "task": op, "model": model_summary(res), "seconds": {"profile": round(t_prof, 2), "relationships": round(t_rel, 2), "automl": round(t_ml, 1)}}
+                      "target": target, "task": op, "excluded": exclude, "model": model_summary(res), "bootstrap": boot,
+                      "warnings": [l for l in res["limitations"] if "carries" in l], "seconds": {"profile": round(t_prof, 2), "relationships": round(t_rel, 2), "automl": round(t_ml, 1)}}
         print(name, json.dumps(rows[name]["model"]["test"]), rows[name]["model"]["selected"], f"{t_ml:.0f}s")
     return rows
 

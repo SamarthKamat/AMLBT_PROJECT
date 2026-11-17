@@ -15,12 +15,13 @@
       ],
       "target": "Profit",
       "task": "predict_value",
+      "excluded": null,
       "model": {
         "selected": "Random Forest Regressor",
         "candidates": 5,
         "cv": {
           "RMSE": 395.6888161170999,
-          "RMSE_std": 43.26009000993024,
+          "RMSE_std": 43.26009000993023,
           "MAE": 253.0082838015271,
           "R2": 0.4771943200851701
         },
@@ -34,10 +35,10 @@
           "RMSE": 536.2070190377617
         },
         "rationale": "Gradient Boosting Regressor scored best (387.7), but Random Forest Regressor (395.7) is within one standard error (23.6) and is simpler, so it was preferred (one-standard-error rule). Hyperparameter tuning (randomised search, 5 settings) lowered 3-fold CV RMSE from 408.4 to 402 and was adopted.",
-        "p_vs_runner_up": 0.40437652166695504,
+        "p_vs_runner_up": 0.4043765216669556,
         "temporal": {
           "R2": 0.5542936815647788,
-          "RMSE": 339.34436339976793
+          "RMSE": 339.344363399768
         },
         "train_rows": 800,
         "test_rows": 200,
@@ -57,10 +58,22 @@
         ],
         "tuning_adopted": true
       },
+      "bootstrap": {
+        "R2": {
+          "point": 0.706740588765111,
+          "ci95": [
+            0.5929820487374431,
+            0.7812618114134916
+          ]
+        }
+      },
+      "warnings": [
+        "One column, 'Discount', carries 45% of the model's attribution. Confirm it is known at the time of prediction (e.g. a call duration is only known after the call); if not, ask again 'without Discount'."
+      ],
       "seconds": {
-        "profile": 0.2,
-        "relationships": 0.43,
-        "automl": 17.7
+        "profile": 0.14,
+        "relationships": 0.3,
+        "automl": 11.2
       }
     },
     "IBM HR Attrition": {
@@ -78,6 +91,7 @@
       ],
       "target": "Attrition",
       "task": "predict_class",
+      "excluded": null,
       "model": {
         "selected": "XGBoost Classifier",
         "candidates": 5,
@@ -119,10 +133,34 @@
         ],
         "tuning_adopted": false
       },
+      "bootstrap": {
+        "F1": {
+          "point": 0.6355555555555555,
+          "ci95": [
+            0.5486291428404714,
+            0.7194802419837905
+          ]
+        },
+        "ROC_AUC": {
+          "point": 0.7964510293737618,
+          "ci95": [
+            0.7232723772599745,
+            0.8627642233673363
+          ]
+        },
+        "PR_AUC": {
+          "point": 0.5040632290289021,
+          "ci95": [
+            0.3644464512904095,
+            0.6439832842765619
+          ]
+        }
+      },
+      "warnings": [],
       "seconds": {
-        "profile": 0.35,
-        "relationships": 0.8,
-        "automl": 13.3
+        "profile": 0.16,
+        "relationships": 0.54,
+        "automl": 9.2
       }
     },
     "IBM Telco Churn": {
@@ -140,6 +178,7 @@
       ],
       "target": "Churn",
       "task": "predict_class",
+      "excluded": null,
       "model": {
         "selected": "Random Forest Classifier",
         "candidates": 5,
@@ -181,13 +220,37 @@
         ],
         "tuning_adopted": null
       },
+      "bootstrap": {
+        "F1": {
+          "point": 0.7284566069814771,
+          "ci95": [
+            0.7017793752403635,
+            0.7520019120040284
+          ]
+        },
+        "ROC_AUC": {
+          "point": 0.8342801415691442,
+          "ci95": [
+            0.8091961251763115,
+            0.8561925144223879
+          ]
+        },
+        "PR_AUC": {
+          "point": 0.64003479778349,
+          "ci95": [
+            0.5887405549560242,
+            0.6939636014879675
+          ]
+        }
+      },
+      "warnings": [],
       "seconds": {
-        "profile": 0.53,
-        "relationships": 1.19,
-        "automl": 28.1
+        "profile": 0.33,
+        "relationships": 0.77,
+        "automl": 17.3
       }
     },
-    "UCI Bank Marketing": {
+    "UCI Bank Marketing (all columns)": {
       "rows": 41188,
       "columns": 21,
       "missing_cells": 0,
@@ -200,6 +263,7 @@
       "keys": [],
       "target": "y",
       "task": "predict_class",
+      "excluded": null,
       "model": {
         "selected": "Random Forest Classifier",
         "candidates": 5,
@@ -241,10 +305,123 @@
         ],
         "tuning_adopted": null
       },
+      "bootstrap": {
+        "F1": {
+          "point": 0.7930095733072345,
+          "ci95": [
+            0.7719174680581449,
+            0.8117292666854937
+          ]
+        },
+        "ROC_AUC": {
+          "point": 0.9440882629107981,
+          "ci95": [
+            0.9355368414264306,
+            0.9524010632412931
+          ]
+        },
+        "PR_AUC": {
+          "point": 0.6607223435557135,
+          "ci95": [
+            0.6173891128479654,
+            0.7082713830905368
+          ]
+        }
+      },
+      "warnings": [
+        "One column, 'duration', carries 34% of the model's attribution. Confirm it is known at the time of prediction (e.g. a call duration is only known after the call); if not, ask again 'without duration'."
+      ],
       "seconds": {
-        "profile": 2.43,
-        "relationships": 2.44,
-        "automl": 45.2
+        "profile": 1.53,
+        "relationships": 1.62,
+        "automl": 35.6
+      }
+    },
+    "UCI Bank Marketing (pre-call, without duration)": {
+      "rows": 41188,
+      "columns": 21,
+      "missing_cells": 0,
+      "quality_score": 99.8,
+      "grade": "A",
+      "issues": 3,
+      "strong_pairs": 20,
+      "hierarchies": 0,
+      "derived": [],
+      "keys": [],
+      "target": "y",
+      "task": "predict_class",
+      "excluded": [
+        "duration"
+      ],
+      "model": {
+        "selected": "Random Forest Classifier",
+        "candidates": 5,
+        "cv": {
+          "F1": 0.7000337692560915,
+          "F1_std": 0.0128051695629666,
+          "Accuracy": 0.8838746788003459
+        },
+        "test": {
+          "Accuracy": 0.8905,
+          "Precision": 0.7248144969702044,
+          "Recall": 0.7151486697965571,
+          "F1": 0.7198196866970004,
+          "ROC_AUC": 0.7978951486697965,
+          "PR_AUC": 0.4552383178067843
+        },
+        "baseline": {
+          "description": "always predicting the most common class",
+          "accuracy": 0.8875
+        },
+        "rationale": "Random Forest Classifier has the best cross-validated score (0.7 \u00b1 0.0128).",
+        "p_vs_runner_up": 0.03593140723798488,
+        "temporal": null,
+        "train_rows": 16000,
+        "test_rows": 4000,
+        "shap_top": [
+          [
+            "emp.var.rate",
+            15.9
+          ],
+          [
+            "nr.employed",
+            10.4
+          ],
+          [
+            "contact",
+            8.9
+          ]
+        ],
+        "tuning_adopted": null
+      },
+      "bootstrap": {
+        "F1": {
+          "point": 0.7198196866970004,
+          "ci95": [
+            0.6973311186606083,
+            0.740544776170905
+          ]
+        },
+        "ROC_AUC": {
+          "point": 0.7978951486697965,
+          "ci95": [
+            0.771600667925673,
+            0.8240404331134864
+          ]
+        },
+        "PR_AUC": {
+          "point": 0.4552383178067843,
+          "ci95": [
+            0.40779266987759233,
+            0.5083339347311946
+          ]
+        }
+      },
+      "warnings": [],
+      "seconds": {
+        "profile": 1.42,
+        "relationships": 1.55,
+        "automl": 34.9
       }
     }
   },
@@ -384,8 +561,8 @@
       },
       {
         "model": "Random Forest (lags)",
-        "RMSE": 15695.051291529051,
-        "MAE": 13524.523189904112,
+        "RMSE": 15695.051291529046,
+        "MAE": 13524.523189904108,
         "MAPE": 29.51108328045537
       },
       {
@@ -526,5 +703,5 @@
       }
     }
   },
-  "seconds_total": 373.1
+  "seconds_total": 295.0
 }
