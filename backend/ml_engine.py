@@ -128,6 +128,12 @@ def _prep_training_frame(vp: ValidatedPlan, ctx: ExecContext, requested: Optiona
         d = d.drop_duplicates()
         notes.append(f"{dups} exact duplicate row(s) were dropped before training so identical rows cannot leak between train and test.")
     feats, excluded = select_features(d, ctx.roles, tgt, requested, always)
+    for c in (p.exclude_columns or []):
+        if c in feats:
+            feats.remove(c)
+            excluded.append({"column": c, "reason": "excluded at the user's request"})
+    if p.exclude_columns:
+        notes.append("Excluded at the user's request: " + ", ".join(p.exclude_columns) + ".")
     if requested:
         dropped = [e["column"] for e in excluded if e["column"] in requested]
         if dropped:
@@ -567,6 +573,10 @@ def _shared_limits(model: TrainedModel, cached: bool) -> List[str]:
             lim.append(f"Time-ordered validation (train to {tv['train_until']}, test from {tv['test_from']}) gives R² = {m['R2']:.2f}, lower than the random split: relationships may be drifting over time.")
         if model.task == "classification" and m.get("F1") is not None and m["F1"] < ev["metrics"]["F1"] - 0.1:
             lim.append(f"Time-ordered validation gives macro F1 = {m['F1']:.2f}, lower than the random split: the pattern may be drifting over time.")
+    top = ((model.shap or {}).get("items") or [None])[0]
+    if top and top.get("share_%", 0) >= 30:
+        lim.append(f"One column, '{top['feature']}', carries {top['share_%']:.0f}% of the model's attribution. Confirm it is known at the time of "
+                   f"prediction (e.g. a call duration is only known after the call); if not, ask again 'without {top['feature']}'.")
     p = ev.get("p_value_vs_runner_up")
     if p is not None and p > 0.05 and ev.get("runner_up"):
         lim.append(f"The selected model is not significantly better than the runner-up ({ev['runner_up']}, paired fold test p = {p:.2f}); either is a reasonable choice.")

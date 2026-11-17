@@ -59,6 +59,7 @@ class AnalysisPlan(BaseModel):
 
     target_column: Optional[str] = None
     feature_columns: Optional[List[str]] = None
+    exclude_columns: Optional[List[str]] = Field(default=None, description="Columns the user wants left out of a model (e.g. 'without duration').")
     group_by: Optional[List[str]] = None
     time_column: Optional[str] = None
     aggregation: Optional[Aggregation] = None

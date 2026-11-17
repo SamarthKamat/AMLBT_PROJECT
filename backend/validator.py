@@ -156,6 +156,7 @@ def validate_plan(plan: AnalysisPlan, df: pd.DataFrame, profile: Dict[str, Any],
     p.group_by = _resolve_list(p.group_by, df, roles, op, "categorical" if op in ("compare_groups", "pivot_table", "explain_change") else "any")
     p.pivot_column = resolve_column(p.pivot_column, df, roles, op, "categorical")
     p.feature_columns = _resolve_list(p.feature_columns, df, roles, op)
+    p.exclude_columns = _resolve_list(p.exclude_columns, df, roles, op)
     for f in p.filters or []:
         f.column = resolve_column(f.column, df, roles, op)
     for ch in p.scenario_changes or []:

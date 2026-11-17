@@ -169,8 +169,11 @@ def intent_model() -> Dict[str, Any]:
 
 # ----------------------------------------------------------------------------- schema linking
 class SchemaLinker:
-    def __init__(self, df: pd.DataFrame, profile: Dict[str, Any]):
+    def __init__(self, df: pd.DataFrame, profile: Dict[str, Any], exact_only: bool = False):
+        """exact_only=True is the ablation used in the evaluation: only literal column names link (no synonyms,
+        distinctive tokens, inflection, stemming or fuzzy matching)."""
         self.profile = profile
+        self.exact_only = exact_only
         self.roles = {c["name"]: c["role"] for c in profile["columns"]}
         self.phrases: List[Tuple[str, str, float]] = []        # (normalised phrase, column, score)
         token_owner: Dict[str, List[str]] = {}
@@ -180,16 +183,17 @@ class SchemaLinker:
             full = " ".join(toks)
             self.phrases.append((_norm(name), name, 1.0))
             self.phrases.append((full, name, 1.0))
-            self.phrases.append((" ".join(_sing(t) for t in toks), name, 0.98))
-            if len(toks) > 1:
-                self.phrases.append(("".join(toks), name, 0.97))
+            if not exact_only:
+                self.phrases.append((" ".join(_sing(t) for t in toks), name, 0.98))
+                if len(toks) > 1:
+                    self.phrases.append(("".join(toks), name, 0.97))
             for t in set(toks):
                 token_owner.setdefault(_sing(t), []).append(name)
         # a distinctive token ("income" in MonthlyIncome) links on its own when only one column has it
-        for t, owners in token_owner.items():
+        for t, owners in ({} if exact_only else token_owner).items():
             if len(owners) == 1 and len(t) >= 5 and t not in STOP and t not in ("id", "no", "num", "number", "code", "name", "date", "type", "level", "rate", "count", "total"):
                 self.phrases.append((t, owners[0], 0.85))
-        for group in SYNONYMS:
+        for group in ([] if exact_only else SYNONYMS):
             owners = {self.phrases[i][1] for i in range(len(self.phrases)) if self.phrases[i][0] in group or _sing(self.phrases[i][0]) in group}
             if len(owners) == 1:
                 owner = owners.pop()
@@ -225,7 +229,7 @@ class SchemaLinker:
                 if not span_free(i, j):
                     continue
                 phrase = " ".join(tokens[i:j])
-                hit_c = next(((c, s) for p, c, s in self.phrases if p == phrase or (n == 1 and _sing(phrase) == p)), None)
+                hit_c = next(((c, s) for p, c, s in self.phrases if p == phrase or (n == 1 and not self.exact_only and _sing(phrase) == p)), None)
                 if hit_c and n == 1 and phrase in VERB_LIKE and all(t in LEAD_IN for t in tokens[:i]) and j < len(tokens) and tokens[j] in (
                         "the", "my", "our", "all", "these", "this", "data", "customers", "employees", "records", "rows", "orders", "by", "it"):
                     hit_c = None                    # "Segment the orders": an instruction verb, not the Segment column
@@ -240,6 +244,10 @@ class SchemaLinker:
         # fuzzy single-token matches for remaining long words (typos: "revnue", "attritoin")
         unknown = []
         for i, t in enumerate(tokens):
+            if self.exact_only:
+                if not taken[i] and len(t) >= 5 and t not in STOP:
+                    unknown.append(t)
+                continue
             if taken[i] or len(t) < 5 or t in STOP or re.fullmatch(r"[\d.%\-+]+", t):
                 continue
             if t in VERB_LIKE and all(x in LEAD_IN for x in tokens[:i]):
@@ -301,8 +309,9 @@ def mask(linked: Linked, roles: Dict[str, str]) -> str:
 class LocalPlanner:
     name = "local-intent-model"
 
-    def __init__(self):
+    def __init__(self, exact_only: bool = False):
         self._linkers: Dict[str, SchemaLinker] = {}
+        self.exact_only = exact_only
 
     def status(self, live: bool = False) -> Dict[str, Any]:
         b = intent_model()
@@ -313,7 +322,7 @@ class LocalPlanner:
         if key not in self._linkers:
             if len(self._linkers) > 32:
                 self._linkers.clear()
-            self._linkers[key] = SchemaLinker(df, profile)
+            self._linkers[key] = SchemaLinker(df, profile, exact_only=self.exact_only)
         return self._linkers[key]
 
     def classify(self, masked: str) -> List[Tuple[str, float]]:
@@ -390,6 +399,12 @@ class LocalPlanner:
         target_nums = [c for c in nums if c not in driver_cols]
         val_cols = {v.column for v in vals}
 
+        excl = self._exclusions(linked, q)
+        if excl and op in ("predict_class", "predict_value", "run_scenario"):
+            plan["exclude_columns"] = excl
+            nums = [c for c in nums if c not in excl]
+            cats = [c for c in cats if c not in excl]
+            target_nums = [c for c in target_nums if c not in excl]
         if op in ("predict_class",):
             outcome = (next((c for c in cats if sem.get(c, {}).get("semantic") == "outcome"), None)
                        or next((c for c in cats if sem.get(c, {}).get("semantic") == "flag"), None) or (cats[0] if cats else None))
@@ -535,6 +550,13 @@ class LocalPlanner:
         if op == "unsupported":
             plan["reasoning"] = "The question is not about analysing the uploaded data."
         return plan
+
+    def _exclusions(self, linked: Linked, q: str) -> List[str]:
+        """Columns after 'without / excluding / except / ignoring / leaving out' are to be left out of a model."""
+        pos = next((i for i, t in enumerate(linked.tokens) if t in ("without", "excluding", "except", "ignoring", "exclude")), None)
+        if pos is None:
+            return []
+        return [m.column for m in linked.mentions if m.kind == "column" and m.start > pos]
 
     def _agg(self, q: str) -> Optional[str]:
         for w, a in AGG_CUES:

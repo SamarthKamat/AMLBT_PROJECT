@@ -34,7 +34,20 @@ import pandas as pd  # noqa: E402
 
 DATASETS = {"superstore": "backend/sample_data/real/global_superstore_sample.csv", "hr": "backend/sample_data/real/ibm_hr_attrition.csv",
             "telco": "backend/sample_data/real/ibm_telco_churn.csv", "bank": "backend/sample_data/real/uci_bank_marketing.csv",
-            "company": "backend/sample_data/company.csv", "hospital": "backend/sample_data/hospital.csv"}
+            "company": "backend/sample_data/company.csv", "hospital": "backend/sample_data/hospital.csv",
+            "college": "backend/sample_data/college.csv", "municipality": "backend/sample_data/municipality.csv",
+            "ngo": "backend/sample_data/ngo.csv", "community": "backend/sample_data/community.csv", "event": "backend/sample_data/event_organizer.csv"}
+
+
+def wilson(k: int, n: int, z: float = 1.96):
+    """Wilson score 95% interval for a proportion."""
+    if n == 0:
+        return None
+    p = k / n
+    den = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / den
+    half = z * (p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5 / den
+    return [round(max(0.0, centre - half), 4), round(min(1.0, centre + half), 4)]
 AGG_LABEL = {"mean": "Average", "sum": "Total", "median": "Median", "min": "Minimum", "max": "Maximum"}
 POS = ("yes", "1", "true", "churned", "late", "left", "default", "y")
 
@@ -79,21 +92,32 @@ def check_numeric(item, res, exp):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--planner", default="local", choices=["local", "gemini", "auto"])
+    ap.add_argument("--planner", default="local", choices=["local", "local-exact", "keyword", "gemini", "auto"])
+    ap.add_argument("--questions", default="benchmark_questions.jsonl")
+    ap.add_argument("--tag", default=None, help="output name; default benchmark_<planner>")
     args = ap.parse_args()
     from app import create_app
     from gemini_client import GeminiService
-    app = create_app(llm=GeminiService(), planner_mode=args.planner)
+    if args.planner == "keyword":
+        sys.path.insert(0, str(ROOT / "evaluation"))
+        from baselines import KeywordPlanner
+        app = create_app(llm=KeywordPlanner(), planner_mode="gemini")
+    else:
+        app = create_app(llm=GeminiService(), planner_mode="local" if args.planner == "local-exact" else args.planner)
+        if args.planner == "local-exact":
+            from local_planner import LocalPlanner
+            app.extensions["udi_planner"].local = LocalPlanner(exact_only=True)
     c = app.test_client()
     store = app.extensions["udi_sessions"]
-    items = [json.loads(l) for l in open(ROOT / "evaluation" / "benchmark_questions.jsonl")]
+    items = [json.loads(l) for l in open(ROOT / "evaluation" / args.questions)]
     sids, frames, rows = {}, {}, []
     t_all = time.time()
     for it in items:
         ds = it["dataset"]
         if ds not in sids:
             p = ROOT / DATASETS[ds]
-            r = c.post("/api/upload", data={"domain": "company" if ds not in ("hospital",) else "hospital", "file": (io.BytesIO(p.read_bytes()), p.name)},
+            dom = {"hospital": "hospital", "college": "college", "municipality": "municipality", "ngo": "ngo", "community": "community", "event": "event_organizer"}.get(ds, "company")
+            r = c.post("/api/upload", data={"domain": dom, "file": (io.BytesIO(p.read_bytes()), p.name)},
                        content_type="multipart/form-data")
             sids[ds] = r.get_json()["session_id"]
             from data_profiler import load_dataset
@@ -143,9 +167,9 @@ def main():
 
     def rate(key, subset=None):
         vals = [r[key] for r in (subset or rows) if r.get(key) is not None]
-        return {"correct": int(sum(vals)), "n": len(vals), "rate": round(sum(vals) / len(vals), 4) if vals else None}
+        return {"correct": int(sum(vals)), "n": len(vals), "rate": round(sum(vals) / len(vals), 4) if vals else None, "ci95": wilson(int(sum(vals)), len(vals))}
     valid = [r for r in rows if r["gold_op"] and not next(i for i in items if i["id"] == r["id"])["error"]]
-    summary = {"planner": args.planner, "questions": len(rows), "datasets": len(sids), "seconds_total": round(time.time() - t_all, 1),
+    summary = {"planner": args.planner, "question_set": args.questions, "questions": len(rows), "datasets": len(sids), "seconds_total": round(time.time() - t_all, 1),
                "intent_accuracy": rate("intent_ok"), "intent_accuracy_answerable": rate("intent_ok", valid), "column_mapping_accuracy": rate("columns_ok"),
                "filter_accuracy": rate("filters_ok"), "invalid_request_rejection": rate("rejection_ok"), "numerical_correctness": rate("numeric_ok"),
                "answered_when_answerable": rate("answered", valid), "end_to_end_pass": rate("pass"),
@@ -154,8 +178,9 @@ def main():
                "per_operation_intent": {op: rate("intent_ok", [r for r in rows if r["gold_op"] == op]) for op in sorted({r["gold_op"] for r in rows})}}
     out = ROOT / "evaluation" / "results"
     out.mkdir(parents=True, exist_ok=True)
-    (out / f"benchmark_{args.planner}.json").write_text(json.dumps(summary, indent=2))
-    with open(out / f"benchmark_{args.planner}_log.csv", "w", newline="", encoding="utf-8") as f:
+    tag = args.tag or f"benchmark_{args.planner}"
+    (out / f"{tag}.json").write_text(json.dumps(summary, indent=2))
+    with open(out / f"{tag}_log.csv", "w", newline="", encoding="utf-8") as f:
         keys = list(dict.fromkeys(k for r in rows for k in r))
         w = csv.DictWriter(f, fieldnames=keys)
         w.writeheader()
