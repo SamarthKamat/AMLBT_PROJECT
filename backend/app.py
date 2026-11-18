@@ -529,7 +529,7 @@ def create_app(llm: Any = None, store: Optional[SessionStore] = None, planner_mo
                 result["preferred_chart"] = vp.plan.chart_type
             trace.append({"agent": "Business Analyst agent", "tool": "business_insights", "status": "ok", "seconds": 0.0,
                           "headline": f"{len(result['business_insights'])} finding(s)"})
-            use_llm = src == "gemini"
+            use_llm = src == "gemini" and config.GEMINI_NARRATION
             answer, source, note = explain_result(llm, question, vp.plan, result, use_llm=use_llm)
             t_end = time.perf_counter()
             trace.append({"agent": "Narrator", "tool": "gemini (grounded)" if source == "gemini" else "python summary", "status": "ok", "seconds": round(t_end - t_exec, 2),

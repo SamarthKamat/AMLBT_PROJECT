@@ -1,22 +1,450 @@
 {
-  "v1_full_vs_keyword": {
-    "full_only": 48,
-    "other_only": 1,
-    "mcnemar_exact_p": 1.7763568394002505e-13
+  "pairs": {
+    "v1_full_vs_keyword": {
+      "first_only": 48,
+      "second_only": 1,
+      "mcnemar_exact_p": 1.7763568394002505e-13
+    },
+    "v1_full_vs_local_exact": {
+      "first_only": 7,
+      "second_only": 0,
+      "mcnemar_exact_p": 0.015625
+    },
+    "v2_full_vs_keyword": {
+      "first_only": 44,
+      "second_only": 5,
+      "mcnemar_exact_p": 7.59715845788378e-09
+    },
+    "v2_full_vs_local_exact": {
+      "first_only": 6,
+      "second_only": 4,
+      "mcnemar_exact_p": 0.75390625
+    },
+    "v3_full_vs_keyword": {
+      "first_only": 35,
+      "second_only": 9,
+      "mcnemar_exact_p": 0.00010604466626773501
+    },
+    "v3_full_vs_local_exact": {
+      "first_only": 4,
+      "second_only": 5,
+      "mcnemar_exact_p": 1.0
+    }
   },
-  "v1_full_vs_local_exact": {
-    "full_only": 7,
-    "other_only": 0,
-    "mcnemar_exact_p": 0.015625
-  },
-  "v2_full_vs_keyword": {
-    "full_only": 44,
-    "other_only": 5,
-    "mcnemar_exact_p": 7.59715845788378e-09
-  },
-  "v2_full_vs_local_exact": {
-    "full_only": 6,
-    "other_only": 4,
-    "mcnemar_exact_p": 0.75390625
+  "splits": {
+    "v1_full": {
+      "all": {
+        "correct": 100,
+        "n": 104,
+        "rate": 0.9615,
+        "ci95": [
+          0.9053,
+          0.9849
+        ]
+      },
+      "public": {
+        "correct": 76,
+        "n": 78,
+        "rate": 0.9744,
+        "ci95": [
+          0.9112,
+          0.9929
+        ]
+      },
+      "generated": {
+        "correct": 24,
+        "n": 26,
+        "rate": 0.9231,
+        "ci95": [
+          0.7586,
+          0.9786
+        ]
+      },
+      "refusal_all": {
+        "correct": 10,
+        "n": 11,
+        "rate": 0.9091,
+        "ci95": [
+          0.6226,
+          0.9838
+        ]
+      },
+      "refusal_public": {
+        "correct": 9,
+        "n": 9,
+        "rate": 1.0,
+        "ci95": [
+          0.7008,
+          1.0
+        ]
+      }
+    },
+    "v1_keyword": {
+      "all": {
+        "correct": 53,
+        "n": 104,
+        "rate": 0.5096,
+        "ci95": [
+          0.4149,
+          0.6036
+        ]
+      },
+      "public": {
+        "correct": 37,
+        "n": 78,
+        "rate": 0.4744,
+        "ci95": [
+          0.3674,
+          0.5838
+        ]
+      },
+      "generated": {
+        "correct": 16,
+        "n": 26,
+        "rate": 0.6154,
+        "ci95": [
+          0.4253,
+          0.7757
+        ]
+      },
+      "refusal_all": {
+        "correct": 5,
+        "n": 11,
+        "rate": 0.4545,
+        "ci95": [
+          0.2127,
+          0.7199
+        ]
+      },
+      "refusal_public": {
+        "correct": 5,
+        "n": 9,
+        "rate": 0.5556,
+        "ci95": [
+          0.2666,
+          0.8112
+        ]
+      }
+    },
+    "v1_local_exact": {
+      "all": {
+        "correct": 93,
+        "n": 104,
+        "rate": 0.8942,
+        "ci95": [
+          0.8205,
+          0.9399
+        ]
+      },
+      "public": {
+        "correct": 71,
+        "n": 78,
+        "rate": 0.9103,
+        "ci95": [
+          0.8262,
+          0.9558
+        ]
+      },
+      "generated": {
+        "correct": 22,
+        "n": 26,
+        "rate": 0.8462,
+        "ci95": [
+          0.6647,
+          0.9385
+        ]
+      },
+      "refusal_all": {
+        "correct": 10,
+        "n": 11,
+        "rate": 0.9091,
+        "ci95": [
+          0.6226,
+          0.9838
+        ]
+      },
+      "refusal_public": {
+        "correct": 9,
+        "n": 9,
+        "rate": 1.0,
+        "ci95": [
+          0.7008,
+          1.0
+        ]
+      }
+    },
+    "v2_full": {
+      "all": {
+        "correct": 87,
+        "n": 99,
+        "rate": 0.8788,
+        "ci95": [
+          0.8,
+          0.9293
+        ]
+      },
+      "public": {
+        "correct": 36,
+        "n": 43,
+        "rate": 0.8372,
+        "ci95": [
+          0.7003,
+          0.9188
+        ]
+      },
+      "generated": {
+        "correct": 51,
+        "n": 56,
+        "rate": 0.9107,
+        "ci95": [
+          0.8074,
+          0.9613
+        ]
+      },
+      "refusal_all": {
+        "correct": 8,
+        "n": 11,
+        "rate": 0.7273,
+        "ci95": [
+          0.4343,
+          0.9025
+        ]
+      },
+      "refusal_public": {
+        "correct": 5,
+        "n": 6,
+        "rate": 0.8333,
+        "ci95": [
+          0.4365,
+          0.9699
+        ]
+      }
+    },
+    "v2_keyword": {
+      "all": {
+        "correct": 48,
+        "n": 99,
+        "rate": 0.4848,
+        "ci95": [
+          0.3888,
+          0.582
+        ]
+      },
+      "public": {
+        "correct": 14,
+        "n": 43,
+        "rate": 0.3256,
+        "ci95": [
+          0.2049,
+          0.4748
+        ]
+      },
+      "generated": {
+        "correct": 34,
+        "n": 56,
+        "rate": 0.6071,
+        "ci95": [
+          0.4763,
+          0.7242
+        ]
+      },
+      "refusal_all": {
+        "correct": 2,
+        "n": 11,
+        "rate": 0.1818,
+        "ci95": [
+          0.0514,
+          0.477
+        ]
+      },
+      "refusal_public": {
+        "correct": 1,
+        "n": 6,
+        "rate": 0.1667,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      }
+    },
+    "v2_local_exact": {
+      "all": {
+        "correct": 85,
+        "n": 99,
+        "rate": 0.8586,
+        "ci95": [
+          0.7765,
+          0.9139
+        ]
+      },
+      "public": {
+        "correct": 36,
+        "n": 43,
+        "rate": 0.8372,
+        "ci95": [
+          0.7003,
+          0.9188
+        ]
+      },
+      "generated": {
+        "correct": 49,
+        "n": 56,
+        "rate": 0.875,
+        "ci95": [
+          0.7637,
+          0.9381
+        ]
+      },
+      "refusal_all": {
+        "correct": 9,
+        "n": 11,
+        "rate": 0.8182,
+        "ci95": [
+          0.523,
+          0.9486
+        ]
+      },
+      "refusal_public": {
+        "correct": 5,
+        "n": 6,
+        "rate": 0.8333,
+        "ci95": [
+          0.4365,
+          0.9699
+        ]
+      }
+    },
+    "v3_full": {
+      "all": {
+        "correct": 73,
+        "n": 100,
+        "rate": 0.73,
+        "ci95": [
+          0.6357,
+          0.8073
+        ]
+      },
+      "public": {
+        "correct": 73,
+        "n": 100,
+        "rate": 0.73,
+        "ci95": [
+          0.6357,
+          0.8073
+        ]
+      },
+      "generated": {
+        "correct": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": null
+      },
+      "refusal_all": {
+        "correct": 23,
+        "n": 36,
+        "rate": 0.6389,
+        "ci95": [
+          0.4757,
+          0.7752
+        ]
+      },
+      "refusal_public": {
+        "correct": 23,
+        "n": 36,
+        "rate": 0.6389,
+        "ci95": [
+          0.4757,
+          0.7752
+        ]
+      }
+    },
+    "v3_keyword": {
+      "all": {
+        "correct": 47,
+        "n": 100,
+        "rate": 0.47,
+        "ci95": [
+          0.3751,
+          0.5671
+        ]
+      },
+      "public": {
+        "correct": 47,
+        "n": 100,
+        "rate": 0.47,
+        "ci95": [
+          0.3751,
+          0.5671
+        ]
+      },
+      "generated": {
+        "correct": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": null
+      },
+      "refusal_all": {
+        "correct": 18,
+        "n": 36,
+        "rate": 0.5,
+        "ci95": [
+          0.3447,
+          0.6553
+        ]
+      },
+      "refusal_public": {
+        "correct": 18,
+        "n": 36,
+        "rate": 0.5,
+        "ci95": [
+          0.3447,
+          0.6553
+        ]
+      }
+    },
+    "v3_local_exact": {
+      "all": {
+        "correct": 74,
+        "n": 100,
+        "rate": 0.74,
+        "ci95": [
+          0.6463,
+          0.816
+        ]
+      },
+      "public": {
+        "correct": 74,
+        "n": 100,
+        "rate": 0.74,
+        "ci95": [
+          0.6463,
+          0.816
+        ]
+      },
+      "generated": {
+        "correct": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": null
+      },
+      "refusal_all": {
+        "correct": 27,
+        "n": 36,
+        "rate": 0.75,
+        "ci95": [
+          0.5893,
+          0.8625
+        ]
+      },
+      "refusal_public": {
+        "correct": 27,
+        "n": 36,
+        "rate": 0.75,
+        "ci95": [
+          0.5893,
+          0.8625
+        ]
+      }
+    }
   }
 }

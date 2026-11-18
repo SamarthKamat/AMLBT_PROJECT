@@ -92,6 +92,7 @@ FREQ_WORDS = [("hourly", "H"), ("hour", "H"), ("daily", "D"), ("day", "D"), ("we
               ("quarterly", "Q"), ("quarter", "Q"), ("yearly", "Y"), ("annual", "Y"), ("annually", "Y"), ("year", "Y")]
 FOLLOW_UP = re.compile(r"^(and|also|now|what about|how about|same|only|just|instead|but|then|ok|okay|break it down|split it|for|in)\b|\b(instead|as well|too|same for|the same|that|those|it)\b")
 NUM = r"(-?\d+(?:[.,]\d+)?)"
+GENERIC_TAIL = {"count", "number", "num", "no", "total", "amount", "rate", "level", "value", "score", "pct", "percent", "id", "flag", "index", "idx", "size"}
 ATTRIBUTE_NOUNS = {"age", "size", "salary", "wage", "gender", "sex", "height", "weight", "name", "address", "tenure", "experience",
                    "education", "email", "phone", "nationality", "religion", "income", "price", "score", "rating", "speed", "capacity", "satisfaction"}
 ROW_NOUNS = {"row", "record", "entry", "observation", "line", "case", "item", "people", "person", "employee", "staff", "worker", "customer", "client",
@@ -197,8 +198,9 @@ class SchemaLinker:
                     self.phrases.append(("".join(toks), name, 0.97))
             for t in set(toks):
                 token_owner.setdefault(_sing(t), []).append(name)
-            if toks:
-                head_tokens[_sing(toks[-1])] = name
+            content = [t for t in toks if _sing(t) not in GENERIC_TAIL]
+            if content:                      # head noun = last content word ("faculty" in Faculty_Count, "income" in MonthlyIncome)
+                head_tokens[_sing(content[-1])] = name
         # a distinctive token ("income" in MonthlyIncome) links on its own when only one column has it
         for t, owners in ({} if exact_only else token_owner).items():
             # only the head noun may stand for the column: "income" -> MonthlyIncome, but "salary" must not -> PercentSalaryHike

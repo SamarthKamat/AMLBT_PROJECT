@@ -19,6 +19,7 @@ def _bool(name: str, default: bool) -> bool:
 # (b) wording an explanation of an already-verified Python result.
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "").strip()
+GEMINI_NARRATION = os.getenv("GEMINI_NARRATION", "on").strip().lower() not in ("off", "0", "false")   # off = plan with Gemini, word answers in Python
 GEMINI_TRANSPORT = os.getenv("GEMINI_TRANSPORT", "sdk").strip().lower()      # sdk | openai (OpenAI-compatible endpoint)
 GEMINI_OPENAI_BASE = os.getenv("GEMINI_OPENAI_BASE", "https://generativelanguage.googleapis.com/v1beta/openai").strip()
 GEMINI_TIMEOUT_SECONDS = int(os.getenv("GEMINI_TIMEOUT_SECONDS", "60"))

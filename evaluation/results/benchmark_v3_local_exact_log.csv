@@ -1,0 +1,101 @@
+id,dataset,question,gold_op,planned_op,gold_target,planned_target,gold_group,planned_group,status,seconds,intent_ok,columns_ok,filters_ok,rejection_ok,answered,numeric_ok,oracle,returned,pass
+v3-superstore-01,superstore,Which market brings in the most sales?,compare_groups,compare_groups,Sales,Sales,Market,Market,answer,0.36,True,True,,,True,True,Asia Pacific,Asia Pacific,True
+v3-superstore-02,superstore,Which sub-category has the lowest total profit?,compare_groups,compare_groups,Profit,Profit,Sub-Category,Sub-Category,answer,0.02,True,True,,,True,True,Supplies,Supplies,True
+v3-superstore-03,superstore,What is the mean discount given?,get_summary,get_summary,Discount,Discount,,,answer,0.01,True,True,,,True,True,0.09284,0.09284,True
+v3-superstore-04,superstore,Total quantity sold in the Technology category,get_summary,get_summary,Quantity,Quantity,,,answer,0.41,True,True,True,,True,True,2321.0,2321.0,True
+v3-superstore-05,superstore,Which order priority has the highest average shipping cost?,compare_groups,compare_groups,Shipping Cost,Shipping Cost,Order Priority,Order Priority,answer,0.01,True,True,,,True,True,Critical,Critical,True
+v3-superstore-06,superstore,How many orders are in the file?,get_summary,get_summary,,,,,answer,0.01,True,,,,True,True,1000.0,1000,True
+v3-superstore-07,superstore,Plot profit over the years,analyze_trend,analyze_trend,Profit,Profit,,,INSUFFICIENT_DATA,0.01,True,True,,,False,,,,False
+v3-superstore-08,superstore,Forecast sales for the next 6 months,forecast,forecast,Sales,Sales,,,answer,3.54,True,True,,,True,,,,True
+v3-superstore-09,superstore,Find anomalous shipping costs,detect_anomalies,detect_anomalies,Shipping Cost,,,,answer,0.55,True,False,,,True,,,,False
+v3-superstore-10,superstore,What drives profit?,calculate_correlation,calculate_correlation,Profit,Profit,,,answer,0.06,True,True,,,True,,,,True
+v3-superstore-11,superstore,Sales by region and segment,pivot_table,pivot_table,Sales,Sales,Region,Region,answer,0.02,True,True,,,True,,,,True
+v3-superstore-12,superstore,Show the 5 biggest sales in the Furniture category,query_records,query_records,Sales,Sales,,,answer,0.02,True,True,True,,True,,,,True
+v3-superstore-13,superstore,Why did sales fall in the latest month?,explain_change,explain_change,Sales,Sales,,,answer,0.05,True,True,,,True,,,,True
+v3-superstore-14,superstore,Write a sales report,generate_report,generate_report,,,,,answer,29.04,True,,,,True,,,,True
+v3-superstore-15,superstore,What if discount goes up by 10%?,run_scenario,run_scenario,,,,,clarification,0.02,True,,,,False,,,,False
+v3-superstore-16,superstore,Which country generated the highest profit?,compare_groups,compare_groups,Profit,Profit,Country,Country,answer,0.08,True,True,,,True,True,India,India,True
+v3-superstore-17,superstore,What is the average customer rating?,get_summary,get_summary,,customer rating,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-superstore-18,superstore,Total sales by sales rep,compare_groups,get_summary,,Sales,,,answer,0.01,False,,,False,,,,,False
+v3-superstore-19,superstore,What is the average delivery delay in days?,get_summary,get_summary,,delivery delay,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-superstore-20,superstore,Which warehouse ships the most orders?,compare_groups,query_records,,,,,answer,0.01,False,,,False,,,,,False
+v3-superstore-21,superstore,Average order profit margin percentage by supplier,compare_groups,get_summary,,Profit,,,answer,0.01,False,,,False,,,,,False
+v3-superstore-22,superstore,What is the average customer age?,get_summary,get_summary,,customer age,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-superstore-23,superstore,Delete all orders from Africa,unsupported,query_records,,,,,answer,0.01,False,,,False,,,,,False
+v3-superstore-24,superstore,Predict the return rate,predict_class,predict_class,,return rate,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-superstore-25,superstore,What is the stock price of the company tomorrow?,unsupported,unsupported,,,,,UNSUPPORTED_OPERATION,0.01,True,,,True,,,,,True
+v3-hr-01,hr,Which department has the highest attrition rate?,compare_groups,compare_groups,Attrition,Attrition,Department,Department,answer,0.02,True,True,,,True,True,Sales,Sales,True
+v3-hr-02,hr,What is the average age of employees?,get_summary,get_summary,Age,Age,,,answer,0.01,True,True,,,True,True,36.923809523809524,36.923809523809524,True
+v3-hr-03,hr,Which education field has the lowest average monthly income?,compare_groups,compare_groups,MonthlyIncome,MonthlyIncome,EducationField,EducationField,answer,0.01,True,True,,,True,True,Technical Degree,Technical Degree,True
+v3-hr-04,hr,Median total working years,get_summary,get_summary,TotalWorkingYears,,,,clarification,0.0,True,False,,,False,False,,,False
+v3-hr-05,hr,Average monthly income for employees in Sales,get_summary,query_records,MonthlyIncome,MonthlyIncome,,,answer,0.01,False,True,True,,True,False,6959.17264573991,,False
+v3-hr-06,hr,How many employees are there?,get_summary,get_summary,,,,,answer,0.01,True,,,,True,True,1470.0,1470,True
+v3-hr-07,hr,Which business travel category has the most attrition?,compare_groups,compare_groups,Attrition,,BusinessTravel,BusinessTravel,answer,0.01,True,False,,,True,False,Travel_Frequently,Travel_Rarely · No,False
+v3-hr-08,hr,What predicts whether an employee leaves?,predict_class,predict_class,Attrition,Attrition,,,answer,33.91,True,True,,,True,,,,True
+v3-hr-09,hr,Estimate monthly income,predict_value,predict_value,MonthlyIncome,MonthlyIncome,,,answer,33.93,True,True,,,True,,,,True
+v3-hr-10,hr,Are there unusual monthly incomes?,detect_anomalies,detect_anomalies,MonthlyIncome,,,,answer,0.34,True,False,,,True,,,,False
+v3-hr-11,hr,Which factors are linked to years at company?,calculate_correlation,calculate_correlation,YearsAtCompany,YearsAtCompany,,,answer,0.06,True,True,,,True,,,,True
+v3-hr-12,hr,Group employees into segments,segment_records,segment_records,,,,,answer,21.33,True,,,,True,,,,True
+v3-hr-13,hr,Produce an HR report,generate_report,generate_report,,,,,answer,49.12,True,,,,True,,,,True
+v3-hr-14,hr,Do a full exploratory analysis,run_eda,run_eda,,,,,answer,0.24,True,,,,True,,,,True
+v3-hr-15,hr,Explain how the columns relate to each other,describe_relationships,describe_relationships,,,,,answer,0.62,True,,,,True,,,,True
+v3-hr-16,hr,Average job satisfaction by gender,compare_groups,compare_groups,JobSatisfaction,JobSatisfaction,Gender,Gender,answer,0.04,True,True,,,True,True,Male,Male,True
+v3-hr-17,hr,What is the average employee bonus?,get_summary,get_summary,,employee bonus,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-hr-18,hr,Which manager has the highest attrition?,compare_groups,compare_groups,,,,Attrition,answer,0.02,True,,,False,,,,,False
+v3-hr-19,hr,Average number of sick days by department,compare_groups,get_summary,,Department,,,answer,0.01,False,,,False,,,,,False
+v3-hr-20,hr,Show the monthly income trend,analyze_trend,analyze_trend,,MonthlyIncome,,,INSUFFICIENT_DATA,0.01,True,,,True,,,,,True
+v3-hr-21,hr,Forecast attrition for next quarter,forecast,forecast,,attrition,,,INSUFFICIENT_DATA,0.01,True,,,True,,,,,True
+v3-hr-22,hr,What is the average commute time in minutes?,get_summary,get_summary,,commute,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-hr-23,hr,Average overtime hours worked per week,get_summary,compare_groups,,overtime hours,,OverTime,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-hr-24,hr,Fire the employees with low performance,unsupported,segment_records,,,,,clarification,0.01,True,,,True,,,,,True
+v3-hr-25,hr,Which office location has the most staff?,compare_groups,compare_groups,,,,,clarification,0.01,True,,,True,,,,,True
+v3-telco-01,telco,Which contract type has the highest churn rate?,compare_groups,compare_groups,Churn,Churn,Contract,Contract,answer,0.05,True,True,,,True,True,Month-to-month,Month-to-month,True
+v3-telco-02,telco,Average monthly charges,get_summary,get_summary,MonthlyCharges,MonthlyCharges,,,answer,0.01,True,True,,,True,True,64.76169246059918,64.76169246059918,True
+v3-telco-03,telco,Which internet service has the lowest average tenure?,compare_groups,compare_groups,tenure,tenure,InternetService,InternetService,answer,0.03,True,True,,,True,True,No,No,True
+v3-telco-04,telco,Total charges for customers on two year contracts,get_summary,query_records,TotalCharges,TotalCharges,,,answer,0.02,False,True,True,,True,False,6283253.7,,False
+v3-telco-05,telco,How many customers do we have?,get_summary,segment_records,,,,,answer,15.46,False,,,,True,True,7043.0,7043,False
+v3-telco-06,telco,Which payment method is the most common?,compare_groups,compare_groups,,,PaymentMethod,PaymentMethod,answer,0.02,True,True,,,True,True,Electronic check,Electronic check,True
+v3-telco-07,telco,What share of customers churned?,get_summary,get_summary,Churn,,,,answer,0.03,True,False,,,True,,,,False
+v3-telco-08,telco,Predict churn,predict_class,predict_class,Churn,Churn,,,answer,31.02,True,True,,,True,,,,True
+v3-telco-09,telco,Predict total charges,predict_value,predict_value,TotalCharges,TotalCharges,,,answer,38.33,True,True,,,True,,,,True
+v3-telco-10,telco,Find outliers in monthly charges,detect_anomalies,detect_anomalies,MonthlyCharges,MonthlyCharges,,,answer,0.35,True,True,,,True,,,,True
+v3-telco-11,telco,What is correlated with tenure?,calculate_correlation,calculate_correlation,tenure,tenure,,,answer,0.11,True,True,,,True,,,,True
+v3-telco-12,telco,Segment the customers,segment_records,segment_records,,,,,answer,20.31,True,,,,True,,,,True
+v3-telco-13,telco,Generate a customer report,generate_report,generate_report,,,,,answer,28.61,True,,,,True,,,,True
+v3-telco-14,telco,Check the data quality,assess_data_quality,assess_data_quality,,,,,answer,0.01,True,,,,True,,,,True
+v3-telco-15,telco,Monthly charges by contract and internet service,pivot_table,pivot_table,MonthlyCharges,MonthlyCharges,Contract,Contract,answer,0.02,True,True,,,True,,,,True
+v3-telco-16,telco,Does tech support affect churn?,compare_groups,compare_groups,Churn,,TechSupport,TechSupport,answer,0.02,True,False,,,True,False,No,No · No,False
+v3-telco-17,telco,What is the average customer satisfaction score?,get_summary,get_summary,,customer satisfaction,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v3-telco-18,telco,Which city has the highest churn?,compare_groups,compare_groups,,,,Churn,answer,0.01,True,,,False,,,,,False
+v3-telco-19,telco,Average number of support calls,get_summary,get_summary,,number,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v3-telco-20,telco,How has churn changed month by month?,analyze_trend,analyze_trend,,,,Churn,INSUFFICIENT_DATA,0.01,True,,,True,,,,,True
+v3-telco-21,telco,Forecast monthly charges for next year,forecast,forecast,,MonthlyCharges,,,INSUFFICIENT_DATA,0.01,True,,,True,,,,,True
+v3-telco-22,telco,What is the average customer age?,get_summary,get_summary,,customer age,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-telco-23,telco,Average data usage per customer,get_summary,get_summary,,,,,clarification,0.0,True,,,True,,,,,True
+v3-telco-24,telco,Email the churners a discount offer,unsupported,unsupported,,,,,UNSUPPORTED_OPERATION,0.0,True,,,True,,,,,True
+v3-telco-25,telco,Which sales channel signs up the most customers?,compare_groups,query_records,,,,,clarification,0.0,True,,,True,,,,,True
+v3-bank-01,bank,Which job has the highest subscription rate?,compare_groups,compare_groups,y,y,job,job,answer,0.08,True,True,,,True,True,student,student,True
+v3-bank-02,bank,Average call duration,get_summary,get_summary,duration,duration,,,answer,0.02,True,True,,,True,True,258.2850101971448,258.2850101971448,True
+v3-bank-03,bank,Which marital status has the lowest average age?,compare_groups,compare_groups,age,age,marital,marital,answer,0.04,True,True,,,True,True,single,single,True
+v3-bank-04,bank,Average number of campaign contacts for students,get_summary,get_summary,campaign,campaign,,,answer,0.02,True,True,False,,True,False,2.104,2.567592502670681,False
+v3-bank-05,bank,How many clients were contacted?,get_summary,get_summary,,,,,answer,0.02,True,,,,True,True,41188.0,41188,True
+v3-bank-06,bank,Which contact type is used most?,compare_groups,compare_groups,,,contact,contact,answer,0.03,True,True,,,True,True,cellular,cellular,True
+v3-bank-07,bank,What fraction of clients subscribed?,get_summary,get_summary,y,,,,answer,0.06,True,False,,,True,,,,False
+v3-bank-08,bank,Predict whether a client subscribes without duration,predict_class,predict_class,y,y,,,answer,45.22,True,True,,,True,,,,True
+v3-bank-09,bank,Find unusual call durations,detect_anomalies,detect_anomalies,duration,,,,answer,1.9,True,False,,,True,,,,False
+v3-bank-10,bank,What is related to the euribor rate?,calculate_correlation,calculate_correlation,euribor3m,,,,answer,0.15,True,False,,,True,,,,False
+v3-bank-11,bank,Cluster the customers,segment_records,segment_records,,,,,answer,3.69,True,,,,True,,,,True
+v3-bank-12,bank,Create a marketing report,generate_report,generate_report,,,,,answer,48.64,True,,,,True,,,,True
+v3-bank-13,bank,Which previous outcome has the highest subscription rate?,compare_groups,compare_groups,y,previous,poutcome,,clarification,0.01,True,False,,,False,False,,,False
+v3-bank-14,bank,Average age by education,compare_groups,compare_groups,age,age,education,education,answer,0.04,True,True,,,True,True,illiterate,illiterate,True
+v3-bank-15,bank,Which day of the week had the most calls?,compare_groups,analyze_trend,,,day_of_week,,clarification,0.0,False,False,,,False,False,,,False
+v3-bank-16,bank,Median number of campaign contacts,get_summary,get_summary,campaign,campaign,,,answer,0.01,True,True,,,True,True,2.0,2.0,True
+v3-bank-17,bank,What is the average account balance?,get_summary,get_summary,,account balance,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-bank-18,bank,Average loan amount by job,compare_groups,compare_groups,,loan amount,,job,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-bank-19,bank,What is the average interest rate on loans?,get_summary,get_summary,,interest rate,,,INVALID_COLUMN,0.01,True,,,True,,,,,True
+v3-bank-20,bank,Which branch has the highest subscription rate?,compare_groups,compare_groups,,y,,,clarification,0.0,True,,,True,,,,,True
+v3-bank-21,bank,What is the average client income?,get_summary,get_summary,,client,,,INVALID_COLUMN,0.0,True,,,True,,,,,True
+v3-bank-22,bank,Average credit score of married clients,get_summary,get_summary,,marital,,,answer,0.02,True,,,False,,,,,False
+v3-bank-23,bank,Call every client who did not subscribe,unsupported,predict_class,,y,,,answer,42.28,False,,,False,,,,,False
+v3-bank-24,bank,Which agent made the most calls?,compare_groups,compare_groups,,,,,clarification,0.01,True,,,True,,,,,True
+v3-bank-25,bank,Will the ECB raise interest rates next month?,unsupported,forecast,,,,,INSUFFICIENT_DATA,0.0,True,,,True,,,,,True

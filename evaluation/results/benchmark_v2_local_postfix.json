@@ -1,0 +1,336 @@
+{
+  "planner": "local",
+  "question_set": "benchmark_questions_v2.jsonl",
+  "questions": 99,
+  "datasets": 9,
+  "seconds_total": 155.3,
+  "intent_accuracy": {
+    "correct": 95,
+    "n": 99,
+    "rate": 0.9596,
+    "ci95": [
+      0.9007,
+      0.9842
+    ]
+  },
+  "intent_accuracy_answerable": {
+    "correct": 84,
+    "n": 88,
+    "rate": 0.9545,
+    "ci95": [
+      0.8889,
+      0.9822
+    ]
+  },
+  "column_mapping_accuracy": {
+    "correct": 67,
+    "n": 75,
+    "rate": 0.8933,
+    "ci95": [
+      0.8034,
+      0.945
+    ]
+  },
+  "filter_accuracy": {
+    "correct": 6,
+    "n": 6,
+    "rate": 1.0,
+    "ci95": [
+      0.6097,
+      1.0
+    ]
+  },
+  "invalid_request_rejection": {
+    "correct": 11,
+    "n": 11,
+    "rate": 1.0,
+    "ci95": [
+      0.7412,
+      1.0
+    ]
+  },
+  "numerical_correctness": {
+    "correct": 30,
+    "n": 32,
+    "rate": 0.9375,
+    "ci95": [
+      0.7985,
+      0.9827
+    ]
+  },
+  "answered_when_answerable": {
+    "correct": 83,
+    "n": 88,
+    "rate": 0.9432,
+    "ci95": [
+      0.8738,
+      0.9755
+    ]
+  },
+  "end_to_end_pass": {
+    "correct": 89,
+    "n": 99,
+    "rate": 0.899,
+    "ci95": [
+      0.824,
+      0.9442
+    ]
+  },
+  "median_seconds": 0.02,
+  "per_dataset": {
+    "college": {
+      "correct": 12,
+      "n": 12,
+      "rate": 1.0,
+      "ci95": [
+        0.7575,
+        1.0
+      ]
+    },
+    "municipality": {
+      "correct": 10,
+      "n": 12,
+      "rate": 0.8333,
+      "ci95": [
+        0.552,
+        0.953
+      ]
+    },
+    "ngo": {
+      "correct": 11,
+      "n": 11,
+      "rate": 1.0,
+      "ci95": [
+        0.7412,
+        1.0
+      ]
+    },
+    "community": {
+      "correct": 9,
+      "n": 10,
+      "rate": 0.9,
+      "ci95": [
+        0.5958,
+        0.9821
+      ]
+    },
+    "event": {
+      "correct": 9,
+      "n": 11,
+      "rate": 0.8182,
+      "ci95": [
+        0.523,
+        0.9486
+      ]
+    },
+    "superstore": {
+      "correct": 12,
+      "n": 12,
+      "rate": 1.0,
+      "ci95": [
+        0.7575,
+        1.0
+      ]
+    },
+    "hr": {
+      "correct": 11,
+      "n": 11,
+      "rate": 1.0,
+      "ci95": [
+        0.7412,
+        1.0
+      ]
+    },
+    "telco": {
+      "correct": 8,
+      "n": 10,
+      "rate": 0.8,
+      "ci95": [
+        0.4902,
+        0.9433
+      ]
+    },
+    "bank": {
+      "correct": 7,
+      "n": 10,
+      "rate": 0.7,
+      "ci95": [
+        0.3968,
+        0.8922
+      ]
+    }
+  },
+  "per_operation_intent": {
+    "analyze_trend": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0,
+      "ci95": [
+        0.5655,
+        1.0
+      ]
+    },
+    "assess_data_quality": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.3424,
+        1.0
+      ]
+    },
+    "calculate_correlation": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0,
+      "ci95": [
+        0.5655,
+        1.0
+      ]
+    },
+    "compare_groups": {
+      "correct": 22,
+      "n": 22,
+      "rate": 1.0,
+      "ci95": [
+        0.8513,
+        1.0
+      ]
+    },
+    "describe_relationships": {
+      "correct": 1,
+      "n": 1,
+      "rate": 1.0,
+      "ci95": [
+        0.2065,
+        1.0
+      ]
+    },
+    "detect_anomalies": {
+      "correct": 6,
+      "n": 6,
+      "rate": 1.0,
+      "ci95": [
+        0.6097,
+        1.0
+      ]
+    },
+    "explain_change": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.3424,
+        1.0
+      ]
+    },
+    "forecast": {
+      "correct": 5,
+      "n": 5,
+      "rate": 1.0,
+      "ci95": [
+        0.5655,
+        1.0
+      ]
+    },
+    "generate_report": {
+      "correct": 3,
+      "n": 3,
+      "rate": 1.0,
+      "ci95": [
+        0.4385,
+        1.0
+      ]
+    },
+    "get_current_state": {
+      "correct": 1,
+      "n": 1,
+      "rate": 1.0,
+      "ci95": [
+        0.2065,
+        1.0
+      ]
+    },
+    "get_summary": {
+      "correct": 22,
+      "n": 24,
+      "rate": 0.9167,
+      "ci95": [
+        0.7415,
+        0.9768
+      ]
+    },
+    "pivot_table": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.3424,
+        1.0
+      ]
+    },
+    "predict_class": {
+      "correct": 5,
+      "n": 7,
+      "rate": 0.7143,
+      "ci95": [
+        0.3589,
+        0.9178
+      ]
+    },
+    "predict_value": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.3424,
+        1.0
+      ]
+    },
+    "query_records": {
+      "correct": 4,
+      "n": 4,
+      "rate": 1.0,
+      "ci95": [
+        0.5101,
+        1.0
+      ]
+    },
+    "run_eda": {
+      "correct": 1,
+      "n": 1,
+      "rate": 1.0,
+      "ci95": [
+        0.2065,
+        1.0
+      ]
+    },
+    "run_scenario": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.3424,
+        1.0
+      ]
+    },
+    "segment_records": {
+      "correct": 3,
+      "n": 3,
+      "rate": 1.0,
+      "ci95": [
+        0.4385,
+        1.0
+      ]
+    },
+    "unsupported": {
+      "correct": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.3424,
+        1.0
+      ]
+    }
+  }
+}

@@ -191,8 +191,8 @@ class GeminiService:
             self._ensure_ready()
         body: Dict[str, Any] = {"model": self.model, "temperature": temperature, "max_tokens": max_tokens,
                                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": contents}]}
-        if json_output:
-            body["response_format"] = {"type": "json_object"}
+        if json_output:                      # same structured-output schema as the SDK path
+            body["response_format"] = {"type": "json_schema", "json_schema": {"name": "analysis_plan", "schema": PLAN_JSON_SCHEMA}}
         last = ""
         for attempt in range(4):
             try:
@@ -204,7 +204,11 @@ class GeminiService:
                 continue
             if r.status_code in (429, 500, 502, 503, 504):
                 last = r.text[:300]
-                time.sleep(4 * (attempt + 1))
+                wait = re.search(r"retry in (?:(\d+)h)?(?:(\d+)m)?([\d.]+)s", r.text)
+                secs = (int(wait.group(1) or 0) * 3600 + int(wait.group(2) or 0) * 60 + float(wait.group(3))) if wait else 8 * (attempt + 1)
+                if secs > 180:                       # a daily quota: waiting will not help
+                    raise UDIError("GEMINI_UNAVAILABLE", "Gemini quota exceeded for today. " + r.text[:200], retryable=False)
+                time.sleep(secs + 1)
                 continue
             if r.status_code == 404:
                 raise UDIError("GEMINI_MODEL_UNAVAILABLE", f"Gemini model '{self.model}' is not available: {r.text[:200]}", retryable=False)

@@ -125,8 +125,13 @@ def main():
         s = store.get(sids[ds])
         s.reset_conversation()                             # every question is asked fresh (no follow-up context)
         t0 = time.time()
-        r = c.post("/api/chat", json={"session_id": sids[ds], "message": it["q"]})
-        body = r.get_json()
+        for attempt in range(4):                           # an API outage / rate limit is retried, never scored as a planning error
+            r = c.post("/api/chat", json={"session_id": sids[ds], "message": it["q"]})
+            body = r.get_json()
+            if body.get("code") != "GEMINI_UNAVAILABLE":
+                break
+            s.reset_conversation()
+            time.sleep(30 * (attempt + 1))
         secs = time.time() - t0
         plan = body.get("plan") or {}
         answered = r.status_code == 200 and body.get("type") == "answer"

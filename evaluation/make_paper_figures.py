@@ -167,7 +167,7 @@ def _holdout_proba(ctx):
 
 def gallery_figure():
     from sklearn.metrics import roc_auc_score, roc_curve
-    fig, ax = plt.subplots(2, 3, figsize=(PAGE, 4.55))
+    fig, ax = plt.subplots(2, 3, figsize=(PAGE, 4.7))
     # (a) ROC
     a = ax[0, 0]
     runs = [("HR", "backend/sample_data/real/ibm_hr_attrition.csv", "Attrition", None, NAVY, "-"),
@@ -238,19 +238,18 @@ def gallery_figure():
     ec = _run(df, p, r, ctx, {"operation": "explain_change", "target_column": "Profit", "aggregation": "sum", "frequency": "Q", "group_by": ["Market"]})
     wf = ec["charts"][0]["data"]
     colors = [NAVY if w["kind"] in ("base", "total") else (TEAL if w["kind"] == "up" else RED) for w in wf]
-    d.bar(range(len(wf)), [w["delta"] / 1e3 for w in wf], bottom=[w["start"] / 1e3 for w in wf], color=colors, width=0.62)
-    running = 0
-    biggest = max(range(1, len(wf) - 1), key=lambda i: abs(wf[i]["value"]))
-    for i, w in enumerate(wf):
-        if w["kind"] in ("base", "total") or i == biggest:
-            top = (w["start"] + w["delta"]) / 1e3
-            lab = f"{w['value'] / 1e3:.1f}k" if w["kind"] in ("base", "total") else f"{w['value'] / 1e3:+.1f}k"
-            d.text(i, top + 0.7, lab, ha="center", fontsize=6)
-    d.set_xticks(range(len(wf)))
-    d.set_xticklabels([w["label"].replace("Asia Pacific", "APAC") for w in wf], rotation=30, ha="right")
-    d.grid(axis="x", visible=False)
-    d.set_ylim(0, max((w["start"] + w["delta"]) for w in wf) / 1e3 * 1.15)
-    d.set_ylabel("profit (thousands)")
+    yy = np.arange(len(wf))[::-1]                       # horizontal waterfall: read top to bottom, labels never rotate
+    d.barh(yy, [w["delta"] / 1e3 for w in wf], left=[w["start"] / 1e3 for w in wf], color=colors, height=0.62)
+    xmax = max((max(w["start"], w["start"] + w["delta"])) for w in wf) / 1e3
+    for y_, w in zip(yy, wf):
+        end = max(w["start"], w["start"] + w["delta"]) / 1e3
+        lab = f"{w['value'] / 1e3:.1f}k" if w["kind"] in ("base", "total") else f"{w['value'] / 1e3:+.1f}k"
+        d.text(end + xmax * 0.02, y_, lab, va="center", fontsize=5.8)
+    d.set_yticks(yy)
+    d.set_yticklabels([w["label"].replace("Asia Pacific", "APAC") for w in wf], fontsize=6)
+    d.grid(axis="y", visible=False)
+    d.set_xlim(0, xmax * 1.3)
+    d.set_xlabel("profit (thousands)")
     _panel_label(d, f"(d) Why profit rose {ec['metrics']['Change %']:.0f}% (by market)")
     # (e) robustness: grouped bars
     e = ax[1, 1]
@@ -274,22 +273,24 @@ def gallery_figure():
     e.grid(axis="x", visible=False)
     e.legend(loc="upper center", ncol=2, handlelength=1, columnspacing=0.8)
     _panel_label(e, "(e) Injected defects: quality vs model")
-    # (f) held-out by dataset
+    # (f) held-out v3 (public data only) by dataset, horizontal so the names stay level
     g = ax[1, 2]
-    v2 = json.loads((OUT / "benchmark_v2_local_heldout.json").read_text())["per_dataset"]
-    kw = json.loads((OUT / "benchmark_v2_keyword.json").read_text())["per_dataset"]
-    names = sorted(v2, key=lambda n: -v2[n]["rate"])
-    xx = np.arange(len(names))
-    g.bar(xx - 0.2, [v2[n]["rate"] * 100 for n in names], 0.4, color=NAVY, label="UDI local planner")
-    g.bar(xx + 0.2, [kw[n]["rate"] * 100 for n in names], 0.4, color=GREY, label="keyword router")
-    g.set_xticks(xx)
-    g.set_xticklabels(names, rotation=55, ha="right", fontsize=6, rotation_mode="anchor")
-    g.set_ylim(0, 128)
-    g.set_yticks([0, 25, 50, 75, 100])
-    g.yaxis.set_major_formatter(mtick.PercentFormatter())
-    g.grid(axis="x", visible=False)
-    g.legend(loc="upper center", ncol=2, handlelength=1)
-    _panel_label(g, "(f) Held-out set v2, per dataset")
+    systems = [("UDI local", "benchmark_v3_local.json", NAVY), ("Gemini planner", "benchmark_v3_gemini.json", TEAL), ("keyword", "benchmark_v3_keyword.json", GREY)]
+    systems = [s_ for s_ in systems if (OUT / s_[1]).exists()]
+    names = ["superstore", "hr", "telco", "bank"]
+    hh = 0.8 / len(systems)
+    for k, (lab, fn, colr) in enumerate(systems):
+        pdx = json.loads((OUT / fn).read_text())["per_dataset"]
+        ys = np.arange(len(names))[::-1] + (len(systems) / 2 - k - 0.5) * hh
+        g.barh(ys, [pdx[n]["rate"] * 100 for n in names], hh * 0.92, color=colr, label=lab)
+    g.set_yticks(np.arange(len(names))[::-1])
+    g.set_yticklabels(["Superstore", "IBM HR", "Telco", "Bank"], fontsize=6)
+    g.set_xlim(0, 100)
+    g.xaxis.set_major_formatter(mtick.PercentFormatter())
+    g.set_xlabel("end-to-end pass, held-out v3")
+    g.grid(axis="y", visible=False)
+    g.legend(loc="lower right", handlelength=1, fontsize=5.6, framealpha=0.9)
+    _panel_label(g, "(f) Held-out v3 (public data), per dataset")
     fig.tight_layout(pad=0.3, h_pad=1.0, w_pad=1.0)
     fig.savefig(OUT / "fig_gallery.pdf")
     plt.close(fig)

@@ -39,7 +39,7 @@ question ─► Planner agent ─► Validation gate ─► Analyst / ML agent �
             model (offline)    real? enough data?   (pandas/sklearn…)                              verified result
 ```
 * **Planner.** `UDI_PLANNER=auto` (default) uses Gemini when a key is configured and the **local intent model** otherwise (or when a Gemini call fails); `gemini` = Gemini only (Phase 1 behaviour); `local` = fully offline. The local planner links words to columns and category values, masks them (`which catcol has the highest numcol`), classifies the intent with TF-IDF + logistic regression (19 classes, trained on a templated corpus in `planner_corpus.py`) and fills slots deterministically. Low confidence → clarification.
-* **Validation gate.** An unknown column is **rejected with the list of available columns, never substituted**; filters must match real values; each operation has data-sufficiency checks.
+* **Validation gate.** An unknown column is **rejected with the list of available columns, never substituted**; the local planner passes the user's own words on when a question names a variable the table lacks ("volunteer age" when only `Volunteers` exists, "how many garbage trucks"), so the gate can refuse it; filters must match real values; each operation has data-sufficiency checks.
 * **Agents** (`agents.py`). Data Analyst (quality, relationships) · Business Analyst (KPIs, segments, margins, trends, root cause) · ML agent (drivers + SHAP, segments, anomalies, forecast) · Report agent. Agents only call validated tools; every call is logged in an **agent trace** shown in the UI and the PDF.
 
 Details: `docs/ARCHITECTURE.md`.
@@ -70,6 +70,8 @@ cd ../backend && .venv/bin/python serve.py        # http://localhost:5000
 |---|---|
 | `UDI_PLANNER` | `auto` (default) · `gemini` · `local` |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | Optional Gemini planning / wording. No default model is hard-coded. |
+| `GEMINI_TRANSPORT` | `sdk` (default, google-genai) or `openai` (Gemini's OpenAI-compatible endpoint, plain HTTPS with `Authorization: Bearer`). |
+| `GEMINI_NARRATION` | `on` (default) or `off`: plan with Gemini but word answers with the verified Python summary (one API call per question). |
 | `UDI_AUTH` | `on` = users register / sign in (PBKDF2 passwords, hashed bearer tokens, first user is admin); sessions are private to their owner. Default `off` (single local user). |
 | `UDI_PERSIST_SESSIONS`, `UDI_DATA_DIR` | Datasets and conversations are stored (SQLite + snapshots) and restored after a restart. |
 | `UDI_SESSION_TTL_SECONDS` | Inactive sessions — including stored files — are deleted after this time (default 6 h). |

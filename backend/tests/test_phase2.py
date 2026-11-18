@@ -207,6 +207,43 @@ def test_local_planner_passes_unknown_variable_to_validator(sales):
     assert e.value.code == "INVALID_COLUMN"
 
 
+def _plan_and_validate(df, q):
+    prof = profile_dataframe(df, "t")
+    plan, info = LocalPlanner().plan_question(q, df, prof, infer_semantics(df, prof))
+    try:
+        validate_plan(plan, df, prof)
+        return plan, None
+    except UDIError as e:
+        return plan, e.code
+
+
+def _ngo_like(n=200, seed=3):
+    rng = np.random.default_rng(seed)
+    return pd.DataFrame({"Date": pd.date_range("2024-01-01", periods=n, freq="D"), "Program": rng.choice(["Health", "Food", "School"], n),
+                         "Volunteers": rng.integers(5, 60, n), "Donations": rng.normal(5000, 900, n).round(2), "Beneficiaries": rng.integers(50, 400, n),
+                         "Faculty_Count": rng.integers(3, 30, n), "OverTime": rng.choice(["Yes", "No"], n),
+                         "PercentSalaryHike": rng.integers(10, 25, n)})
+
+
+@pytest.mark.parametrize("q", ["What is the average volunteer age?", "Average donation size per beneficiary", "How many garbage trucks are deployed?",
+                               "What is the average employee salary?"])
+def test_near_miss_variables_are_refused_not_substituted(q):
+    plan, code = _plan_and_validate(_ngo_like(), q)
+    assert code == "INVALID_COLUMN", (q, plan)
+
+
+def test_over_time_is_a_time_phrase_not_the_overtime_column():
+    df = _ngo_like().drop(columns=["Date"])
+    plan, code = _plan_and_validate(df, "Are donations rising over time?")
+    assert plan.operation == "analyze_trend" and code == "INSUFFICIENT_DATA"
+    assert "OverTime" not in (plan.group_by or [])
+
+
+def test_head_noun_before_generic_tail_still_links():
+    plan, code = _plan_and_validate(_ngo_like(), "Which program has the fewest faculty in total?")
+    assert code is None and plan.target_column == "Faculty_Count"
+
+
 # ----------------------------------------------------------------------------- API, persistence, security
 def _client(tmp, **kw):
     app = create_app(llm=DownLLM(), planner_mode="local", data_dir=Path(tmp), **kw)
