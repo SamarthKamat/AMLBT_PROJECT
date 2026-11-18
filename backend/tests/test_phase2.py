@@ -310,3 +310,26 @@ def test_unknown_exclusion_is_rejected(delivery):
     with pytest.raises(UDIError) as e:
         validate_plan(AnalysisPlan(operation="predict_value", target_column="Delivery_Time", exclude_columns=["Mileage"]), df, prof, roles)
     assert e.value.code == "INVALID_COLUMN"
+
+
+def test_forecast_guard_rejects_a_diverging_refit(retail, monkeypatch):
+    """A model that wins the backtest but explodes when refit on all history must not be shown."""
+    import forecasting_engine as fe
+    real = fe._candidates
+
+    def rigged(m, n):
+        c = real(m, n)
+        calls = {"n": 0}
+
+        def boom(y, h, mm):
+            calls["n"] += 1
+            # perfect in the backtest folds (returns the future values it cannot know: emulate a backtest winner) ...
+            if len(y) < n:
+                return np.repeat(float(y[-1]), h) * 0 + float(np.mean(y[-3:]))
+            return np.full(h, 1e12)                          # ... but diverges on the final fit
+        return {"Exploding model": boom, **c}
+    monkeypatch.setattr(fe, "_candidates", rigged)
+    df, prof, roles, ctx = retail
+    res = execute(validate_plan(AnalysisPlan(operation="forecast", target_column="Units_Sold", frequency="W", forecast_horizon=4, aggregation="sum"), df, prof, roles), ctx)
+    assert max(r["forecast"] for r in res["forecast"]["periods"]) < 1e9
+    assert res["evaluation"]["selected_model"] != "Exploding model" or not any("diverged" in l for l in res["limitations"])

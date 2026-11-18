@@ -21,9 +21,9 @@
         "candidates": 5,
         "cv": {
           "RMSE": 395.6888161170999,
-          "RMSE_std": 43.26009000993023,
+          "RMSE_std": 43.260090009930245,
           "MAE": 253.0082838015271,
-          "R2": 0.4771943200851701
+          "R2": 0.47719432008517015
         },
         "test": {
           "MAE": 213.8516424266262,
@@ -35,7 +35,7 @@
           "RMSE": 536.2070190377617
         },
         "rationale": "Gradient Boosting Regressor scored best (387.7), but Random Forest Regressor (395.7) is within one standard error (23.6) and is simpler, so it was preferred (one-standard-error rule). Hyperparameter tuning (randomised search, 5 settings) lowered 3-fold CV RMSE from 408.4 to 402 and was adopted.",
-        "p_vs_runner_up": 0.4043765216669556,
+        "p_vs_runner_up": 0.40437652166695526,
         "temporal": {
           "R2": 0.5542936815647788,
           "RMSE": 339.344363399768
@@ -71,9 +71,9 @@
         "One column, 'Discount', carries 45% of the model's attribution. Confirm it is known at the time of prediction (e.g. a call duration is only known after the call); if not, ask again 'without Discount'."
       ],
       "seconds": {
-        "profile": 0.14,
-        "relationships": 0.3,
-        "automl": 11.2
+        "profile": 0.18,
+        "relationships": 0.33,
+        "automl": 15.5
       }
     },
     "IBM HR Attrition": {
@@ -158,9 +158,9 @@
       },
       "warnings": [],
       "seconds": {
-        "profile": 0.16,
-        "relationships": 0.54,
-        "automl": 9.2
+        "profile": 0.21,
+        "relationships": 0.68,
+        "automl": 12.7
       }
     },
     "IBM Telco Churn": {
@@ -245,9 +245,9 @@
       },
       "warnings": [],
       "seconds": {
-        "profile": 0.33,
-        "relationships": 0.77,
-        "automl": 17.3
+        "profile": 0.43,
+        "relationships": 1.05,
+        "automl": 25.3
       }
     },
     "UCI Bank Marketing (all columns)": {
@@ -332,9 +332,9 @@
         "One column, 'duration', carries 34% of the model's attribution. Confirm it is known at the time of prediction (e.g. a call duration is only known after the call); if not, ask again 'without duration'."
       ],
       "seconds": {
-        "profile": 1.53,
-        "relationships": 1.62,
-        "automl": 35.6
+        "profile": 1.95,
+        "relationships": 2.2,
+        "automl": 43.0
       }
     },
     "UCI Bank Marketing (pre-call, without duration)": {
@@ -419,9 +419,9 @@
       },
       "warnings": [],
       "seconds": {
-        "profile": 1.42,
-        "relationships": 1.55,
-        "automl": 34.9
+        "profile": 1.84,
+        "relationships": 2.04,
+        "automl": 41.2
       }
     }
   },
@@ -520,11 +520,11 @@
     }
   },
   "forecasting": {
-    "selected": "ARIMA / SARIMA (AIC-selected)",
+    "selected": "Linear trend + seasonal profile",
     "metrics": {
-      "MAE": 10849.542489168922,
-      "RMSE": 13835.778646415632,
-      "MAPE": 24.147746146239797
+      "MAE": 9975.917662343432,
+      "RMSE": 14237.995271834761,
+      "MAPE": 25.10476692274884
     },
     "baseline": {
       "model": "Moving average",
@@ -533,7 +533,7 @@
       "MAPE": 25.705418334036334,
       "selected": false
     },
-    "skill_%": 13.058198690234024,
+    "skill_%": 10.530734293444633,
     "candidates": [
       {
         "model": "ARIMA / SARIMA (AIC-selected)",
@@ -561,9 +561,9 @@
       },
       {
         "model": "Random Forest (lags)",
-        "RMSE": 15695.051291529046,
-        "MAE": 13524.523189904108,
-        "MAPE": 29.51108328045537
+        "RMSE": 15695.051291529051,
+        "MAE": 13524.523189904112,
+        "MAPE": 29.511083280455377
       },
       {
         "model": "Moving average",
@@ -703,5 +703,5 @@
       }
     }
   },
-  "seconds_total": 295.0
+  "seconds_total": 371.9
 }

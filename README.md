@@ -83,7 +83,7 @@ cd ../backend && .venv/bin/python serve.py        # http://localhost:5000
 ## 6. Tests and evaluation
 ```bash
 cd backend
-python -m pytest -q                                    # 171 tests (offline; Gemini replaced by a test double)
+python -m pytest -q                                    # 172 tests (offline; Gemini replaced by a test double)
 cd ..
 python evaluation/run_benchmark.py --planner local --questions benchmark_questions_v2.jsonl   # frozen held-out set v2 (99 q)
 python evaluation/run_benchmark.py --planner keyword   # rule-based comparison (also: local-exact ablation)

@@ -260,8 +260,26 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
     best_baseline = min((r for r in ok if r["model"] in ("Naive (last value)", "Seasonal naive", "Moving average")), key=lambda r: r["RMSE"], default=None)
 
     # ---- final fit on all history
-    fn = cands[best["model"]]
-    fc = np.asarray(fn(y, horizon, m), dtype=float)
+    # final fit on all history, with a sanity guard: a forecast that is non-finite or leaves the plausible range
+    # (more than 3 history ranges beyond the observed min/max) means the refit diverged -> use the next-best model
+    lo_ok, hi_ok = float(np.min(y)) - 3 * float(np.ptp(y)), float(np.max(y)) + 3 * float(np.ptp(y))
+    fc, rejected = None, []
+    for cand in ok:
+        try:
+            out = np.asarray(cands[cand["model"]](y, horizon, m), dtype=float)
+        except Exception:
+            out = None
+        if out is not None and np.all(np.isfinite(out)) and out.min() >= lo_ok and out.max() <= hi_ok:
+            if cand["model"] != best["model"]:
+                rejected.append(best["model"])
+                for r in scores:
+                    r["selected"] = r.get("model") == cand["model"]
+                best = cand
+            fc = out
+            break
+        rejected.append(cand["model"])
+    if fc is None:
+        raise UDIError("MODEL_TRAINING_ERROR", "Every forecasting model produced an implausible forecast for this series.")
     pooled = np.concatenate(errors_pool[best["model"]]) if errors_pool.get(best["model"]) else np.array([best["RMSE"]])
     sigma = float(np.sqrt(np.mean(pooled ** 2)))
     sig_h = _interval_sigmas(errors_pool.get(best["model"], []), horizon, h_bt)
@@ -295,6 +313,8 @@ def forecast(vp: ValidatedPlan, ctx: ExecContext) -> Dict[str, Any]:
             summary += f" That is {skill:.0f}% lower error than the best naive baseline ({best_baseline['model']})."
     if gaps:
         lim.append(f"{gaps} {unit}(s) without data were filled by linear interpolation.")
+    if rejected:
+        lim.append(f"{', '.join(dict.fromkeys(rejected))} won the backtest but diverged when refit on the full history, so the next-best model was used.")
     assumptions = list(vp.assumptions)
     if freq_note:
         assumptions.append(freq_note)

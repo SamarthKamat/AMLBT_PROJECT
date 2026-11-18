@@ -4,6 +4,7 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta}
@@ -28,7 +29,7 @@ Email: deepanshul2026b@gim.ac.in, samarth.kamat2026b@gim.ac.in}}
 \maketitle
 
 \begin{abstract}
-Managers hold operational data but rarely have an analyst at hand to ask ``which country sells most?'', ``why did profit fall?'' or ``who is likely to leave?''. We present UDI~2.0, a conversational platform that answers such questions on any uploaded CSV/Excel table and turns the answers into business decisions. A planner (Gemini, or a trained offline intent model) converts each question into a structured plan; a validation gate checks every column, filter and data requirement against the real data; one of 18 controlled Python operations computes the result; and analyst, machine-learning and report agents add a column-relationship map, a 0--100 data-quality score with auditable cleaning, AutoML with one-standard-error selection and exact-additivity SHAP, statistical forecasting, root-cause decomposition and function-specific reports. On two frozen question sets over eleven datasets, end-to-end correctness was 88.5\% (95\% CI 80.9--93.3) on the first and 87.9\% (80.0--92.9) on a second set frozen before any run, against 48--51\% for a keyword-rule router (McNemar $p<10^{-8}$); every checked number was compared with an independent pandas oracle. On public HR, telecom and bank-marketing data the selected models reached held-out ROC-AUC 0.80--0.83 after removing a post-outcome variable that had inflated the bank result to 0.94, and the quality engine recovered all five injected defect types. All 171 automated tests pass.
+Managers hold operational data but rarely have an analyst at hand to ask ``which country sells most?'', ``why did profit fall?'' or ``who is likely to leave?''. We present UDI~2.0, a conversational platform that answers such questions on any uploaded CSV/Excel table and turns the answers into business decisions. A planner (Gemini, or a trained offline intent model) converts each question into a structured plan; a validation gate checks every column, filter and data requirement against the real data; one of 18 controlled Python operations computes the result; and analyst, machine-learning and report agents add a column-relationship map, a 0--100 data-quality score with auditable cleaning, AutoML with one-standard-error selection and exact-additivity SHAP, statistical forecasting, root-cause decomposition and function-specific reports. On two frozen question sets over eleven datasets, end-to-end correctness was 88.5\% (95\% CI 80.9--93.3) on the first and 87.9\% (80.0--92.9) on a second set frozen before any run, against 48--51\% for a keyword-rule router (McNemar $p<10^{-8}$); every checked number was compared with an independent pandas oracle. On public HR, telecom and bank-marketing data the selected models reached held-out ROC-AUC 0.80--0.83 after removing a post-outcome variable that had inflated the bank result to 0.94, and the quality engine recovered all five injected defect types. All 172 automated tests pass.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -105,7 +106,7 @@ The winner is tuned by randomised search (kept only if CV improves) and evaluate
 so additivity is exact (gap $<10^{-14}$; error $<10^{-8}$ against closed-form Shapley values of a linear model in our tests).
 
 \subsection{Forecasting, decision intelligence and reports}
-Forecasts compare naive, seasonal-naive, moving-average, trend+season, ridge-autoregressive, random-forest and boosting lag models, damped Holt--Winters ETS and AIC-selected ARIMA/SARIMA in a rolling-origin backtest~\cite{hyndman2021}; intervals (80/95\%) widen with the horizon from step-ahead backtest errors, and skill against the best baseline is reported. \emph{explain\_change} decomposes a KPI change between two periods exactly over the groups $g$ of each dimension: $\Delta=\sum_g(M_{gB}-M_{gA})$ for sums, and $\Delta\bar{m}=\sum_g(w_{gB}-w_{gA})\bar m_{gA}+\sum_g w_{gB}(\bar m_{gB}-\bar m_{gA})$ (mix vs rate) for means. \emph{segment\_records} runs K-means with $k$ chosen by silhouette. For a business function, a Data Analyst agent (quality, relationships), a Business Analyst agent (KPIs, dimensions ranked by association with the outcome, comparisons, margins, trend, root cause), an ML agent (driver model with SHAP, segments, anomalies, forecast) and a Report agent assemble ranked findings with a suggested action, evidence and, where arithmetic allows, an illustrative non-causal impact. Agents can only call validated tools, and every call is logged in an agent trace exported with the PDF/Excel report. The API adds SQLite persistence, optional authentication with owner-scoped sessions, rate limiting, background jobs, metrics and a Docker image.
+Forecasts compare naive, seasonal-naive, moving-average, trend+season, ridge-autoregressive, random-forest and boosting lag models, damped Holt--Winters ETS and AIC-selected ARIMA/SARIMA in a rolling-origin backtest~\cite{hyndman2021}; intervals (80/95\%) widen with the horizon from step-ahead backtest errors, skill against the best baseline is reported, and a refit that leaves the plausible range falls back to the next-best model. \emph{explain\_change} decomposes a KPI change between two periods exactly over the groups $g$ of each dimension: $\Delta=\sum_g(M_{gB}-M_{gA})$ for sums, and $\Delta\bar{m}=\sum_g(w_{gB}-w_{gA})\bar m_{gA}+\sum_g w_{gB}(\bar m_{gB}-\bar m_{gA})$ (mix vs rate) for means. \emph{segment\_records} runs K-means with $k$ chosen by silhouette. For a business function, a Data Analyst agent (quality, relationships), a Business Analyst agent (KPIs, dimensions ranked by association with the outcome, comparisons, margins, trend, root cause), an ML agent (driver model with SHAP, segments, anomalies, forecast) and a Report agent assemble ranked findings with a suggested action, evidence and, where arithmetic allows, an illustrative non-causal impact. Agents can only call validated tools, and every call is logged in an agent trace exported with the PDF/Excel report. The API adds SQLite persistence, optional authentication with owner-scoped sessions, rate limiting, background jobs, metrics and a Docker image.
 
 \begin{figure*}[t]
 \centering
@@ -164,14 +165,9 @@ Answerable questions answered & 97.8\% \ci{92.5}{99.4} & 93.2\% \ci{85.9}{96.8}\
 \end{tabular}
 \end{table}
 
-\textbf{Comparison.} Fig.~\ref{fig:bench} and Table~\ref{tab:cmp} compare the three planners on identical execution. The keyword router selects a plausible operation for most questions (85--90\% intent accuracy) but fails at the column and filter level, reaching only 51.0\% and 48.5\% end to end; UDI is significantly better on both sets (exact McNemar $p=1.8\times10^{-13}$ and $7.6\times10^{-9}$). Exact-name linking is significantly worse than full linking on v1 ($p=0.016$, 89.4\% vs 96.2\%) but not on the held-out v2 (85.9\% vs 87.9\%, $p=0.75$): synonym and fuzzy linking help with business vocabulary (``salary''$\to$MonthlyIncome) but are not the main source of accuracy, which comes from masking plus the validation gate.
+\textbf{Comparison.} Table~\ref{tab:cmp} and Fig.~\ref{fig:gallery}f compare the three planners on identical execution. The keyword router selects a plausible operation for most questions (85--90\% intent accuracy) but fails at the column and filter level, reaching only 51.0\% and 48.5\% end to end; UDI is significantly better on both sets (exact McNemar $p=1.8\times10^{-13}$ and $7.6\times10^{-9}$). Exact-name linking is significantly worse than full linking on v1 ($p=0.016$, 89.4\% vs 96.2\%) but not on the held-out v2 (85.9\% vs 87.9\%, $p=0.75$): synonym and fuzzy linking help with business vocabulary (``salary''$\to$MonthlyIncome) but are not the main source of accuracy, which comes from masking plus the validation gate.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/fig_benchmark.pdf}
-\caption{End-to-end correctness (Wilson 95\% CI) of the keyword router, the exact-linking ablation and the full local planner, all with the same validation gate and operations.}
-\label{fig:bench}
-\end{figure}
+
 
 \begin{table}[t]
 \caption{Comparison systems (same validation and operations)}
@@ -209,17 +205,54 @@ Bank / y, all columns (leaky) & Random Forest & F1 .782 $\pm$ .011 & F1 .793 [.7
 \end{tabular}}
 \end{table*}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_ops.pdf}
+\caption{(a) Intent accuracy per gold operation, pooled over the two frozen runs (v1 run 1 and v2; n=203). (b) Median wall-clock time per answered question on a 4-core laptop-class CPU, including model training for predictive operations.}
+\label{fig:ops}
+\end{figure}
+
+\textbf{Per operation and latency.} Fig.~\ref{fig:ops} breaks routing down by operation: 15 of 18 operations were always routed correctly; the misses cluster in \emph{predict\_class} (10/13; outcomes named with uncommon words), \emph{get\_summary} and \emph{query\_records}. Descriptive answers return in a median of 10--60\,ms, anomaly detection and segmentation in under a second, and model-based answers in 3--13\,s because candidate models are trained, cross-validated and explained on demand.
+
 \subsection{AutoML, explanations and leakage}
 Table~\ref{tab:ml} reports the selected models. All beat their baselines on threshold-free metrics; accuracy alone would mislead on imbalanced HR (0.861 vs a majority baseline of 0.840), which is why UDI reports macro-F1, ROC-AUC and PR-AUC. On Superstore, gradient boosting had the lowest CV RMSE (387.7) but random forest (395.7) lay within one standard error (23.6) and was chosen; the time-ordered check (R$^2$ 0.554 vs 0.707) reveals drift a random split hides. In the bank data, call \emph{duration} is recorded only after the call~\cite{moro2014}, so the all-columns ROC-AUC of 0.944 is not achievable when choosing whom to call. The dominance warning now flags it (34\% of attribution), and the realistic pre-call model (``predict subscription without duration'') reaches 0.798 \ci{0.772}{0.824}; we report only this figure as the bank result. The same warning also fires on Superstore's Discount (45\%), which \emph{is} known before a sale; the warning is therefore a prompt for a human check, not a leakage detector. SHAP drivers are business-plausible: OverTime and income for attrition, contract type and tenure for churn, macro indicators and contact channel for subscription.
 
 \subsection{Data quality, forecasting and decision support}
-The quality engine recovered 100\% of every injected defect type on both datasets (HR: 294 missing cells, 29 outliers, 14 negatives, 73 label variants, 44 duplicates; Telco about five times larger). The score fell from 100 to 92.3 (HR) and 92.0 (Telco) and returned to 99.9 and 99.8 after auto-cleaning. Macro-F1 moved little (HR 0.636/0.618/0.647; Telco 0.729/0.732/0.725 for original/corrupted/cleaned), so the tree ensembles were robust to these defects and the main value of cleaning here lies in correct descriptive statistics and group counts. Because the injected defects were gross, recall on subtle real-world errors will be lower. For monthly Superstore sales, AIC-selected ARIMA won the backtest (RMSE 13,836, MAPE 24.1\%), 13.1\% better than the best baseline. In reports the agents surfaced decision-relevant gaps such as attrition of 39.8\% among Sales Representatives versus 2.5\% among Research Directors, and churn of 42.7\% on month-to-month contracts versus 2.8\% on two-year contracts, each with its evidence.
+As Fig.~\ref{fig:gallery}e shows, the quality engine recovered 100\% of every injected defect type on both datasets (HR: 294 missing cells, 29 outliers, 14 negatives, 73 label variants, 44 duplicates; Telco about five times larger). The score fell from 100 to 92.3 (HR) and 92.0 (Telco) and returned to 99.9 and 99.8 after auto-cleaning. Macro-F1 moved little (HR 0.636/0.618/0.647; Telco 0.729/0.732/0.725 for original/corrupted/cleaned), so the tree ensembles were robust to these defects and the main value of cleaning here lies in correct descriptive statistics and group counts. Because the injected defects were gross, recall on subtle real-world errors will be lower. For monthly Superstore sales, AIC-selected ARIMA won the rolling backtest (RMSE 13,836) but diverged when refit on the full history; a new sanity guard (a forecast more than three history ranges outside the observed values is rejected) therefore fell back to trend + seasonal profile (RMSE 14,238, MAPE 25.1\%, 10.5\% below the best baseline), and the answer states why (Fig.~\ref{fig:gallery}c). This failure was found while preparing this paper and is now covered by a regression test. In reports the agents surfaced decision-relevant gaps such as attrition of 39.8\% among Sales Representatives versus 2.5\% among Research Directors, and churn of 42.7\% on month-to-month contracts versus 2.8\% on two-year contracts, each with its evidence.
 
 \subsection{Generated domains and software verification}
-On the seven generated datasets the engine reached regression R$^2$ 0.28--0.90 and classification macro-F1 0.72--1.00; perfect scores arise because the generated risk labels are deterministic functions of other columns, so they are not evidence of real-world performance. The suite has 171 executed tests, all passing (Phase~1: 112 defined functions, 141 executed cases), including source scans for \texttt{exec}/\texttt{eval}, persistence across restarts, owner-scoped access, rate limiting and report export. The React build was verified and all six UI tabs were exercised in a headless browser, locally and on a free-tier public deployment.
+On the seven generated datasets the engine reached regression R$^2$ 0.28--0.90 and classification macro-F1 0.72--1.00; perfect scores arise because the generated risk labels are deterministic functions of other columns, so they are not evidence of real-world performance. The suite has 172 executed tests, all passing (Phase~1: 112 defined functions, 141 executed cases), including source scans for \texttt{exec}/\texttt{eval}, persistence across restarts, owner-scoped access, rate limiting and report export. The React build was verified and all six UI tabs were exercised in a headless browser, locally and on a free-tier public deployment.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_gallery.pdf}
+\caption{Results gallery, all produced by UDI's operations on public data. (a) Hold-out ROC curves; the dashed curve is the leaky bank model that uses call duration. (b) SHAP drivers of attrition with effect direction. (c) Monthly Superstore sales with the guarded forecast and 80/95\% bands. (d) Root-cause waterfall of the 2015-Q3$\to$Q4 profit change by market. (e) Defect injection: the quality score drops and recovers after cleaning while macro-F1 barely moves. (f) End-to-end correctness on the held-out v2 set per dataset, UDI vs the keyword router.}
+\label{fig:gallery}
+\end{figure*}
 
 \section{Discussion}
 \textbf{Business value.} UDI moves from ``what happened'' to ``where it happened, how sure we are, and what to look at next'': the relationship map explains the schema, the quality score states how far the data can be trusted, SHAP and root-cause waterfalls justify each finding, and the leakage warning stops a manager from trusting a model that uses information unavailable at decision time, as the bank example shows. The offline planner matters in practice: organisations that cannot send schemas to an external API still get the same validation guarantees.
+
+\textbf{Case study.} Table~\ref{tab:case} replays an HR manager's session on IBM HR with the offline planner, unedited. The follow-up ``only for the Sales department'' keeps the earlier measure and grouping and adds a filter; the model answer names its baseline and drivers; a non-significant comparison is labelled as such instead of being ranked; and a request for a variable the data lacks is refused with the available columns. This is the behaviour a manager needs: answers that are fast, but also visibly bounded by what the data supports.
+
+\begin{table}[t]
+\caption{A recorded HR session (local planner, IBM HR data, unedited)}
+\label{tab:case}
+\centering\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.95cm}>{\raggedright\arraybackslash}p{1.85cm}>{\raggedright\arraybackslash}p{4.0cm}}
+\toprule
+Question & Plan & Verified answer (abridged)\\
+\midrule
+Which job role has the highest attrition rate? & compare\_groups (Attrition by JobRole) & 39.8\% for Sales Representatives vs 2.5\% for Research Directors; $\chi^2$ $p=2.8{\times}10^{-15}$.\\
+Only for the Sales department & same + filter Department\,=\,Sales & Sales Representatives 39.8\% vs Managers 5.4\%; $p=2.6{\times}10^{-6}$.\\
+What predicts attrition? & predict\_class (Attrition) & XGBoost from 5 candidates; hold-out F1 0.636, AUC 0.796 (majority baseline acc.\ 0.840); drivers OverTime, MonthlyIncome, Age.\\
+Average monthly income by overtime & compare\_groups (Monthly\-Income by OverTime) & 6,549 vs 6,485; \emph{not significant} (Kruskal--Wallis $p=0.73$), so no ranking is claimed.\\
+What is the average bonus? & refused: INVALID\_COLUMN & ``The dataset does not contain a `bonus' variable. Available variables include Age, Attrition, \dots''\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \textbf{Limitations and threats to validity.} The question sets are small (CIs of $\pm$6--8 points) and were drafted with AI assistance rather than by independent users; v2's pre-registration limits but does not remove this bias, and a study with managers' own questions is the most important next step. No LLM-based comparison was executed (no API key in the environment), so UDI's advantage over a plain LLM or an agent such as LAMBDA is argued, not measured. Refusal of near-miss variables (72.7\% on v2) is the weakest behaviour. Analyses are associational: SHAP describes the model, decomposition shows where a change occurred, and impact estimates hold volumes constant. UDI handles one flat table per session.
 
@@ -227,7 +260,7 @@ On the seven generated datasets the engine reached regression R$^2$ 0.28--0.90 a
 UDI~2.0 shows that a conversational analyst can be both broad and verifiable: 18 validated operations, a relationship map, quality scoring with auditable cleaning, leakage-aware explainable AutoML, statistical forecasting, root-cause analysis and multi-agent reports, with no number ever produced by a language model. On frozen questions it was correct 88\% of the time end to end, far above a rule-based router, and its errors are visible and explained rather than silent. Future work: a user study, the LLM comparisons, multi-table joins, conformal intervals and causal uplift estimates for recommendations.
 
 \section{Reproducibility and AI Use}
-Code, datasets, both question sets (with the v2 hash), per-question pass/fail logs, figures and the executed test log are at \href{https://github.com/SamarthKamat/AMLBT_PROJECT}{\texttt{github.com/SamarthKamat/AMLBT\_PROJECT}}. Setup: \texttt{run\_windows.bat}, \texttt{run\_unix.sh} or \texttt{docker compose up} (Python 3.11+, Node 18+; versions pinned). Tables~\ref{tab:bench}--\ref{tab:ml} and Fig.~\ref{fig:bench} are reproduced by \texttt{evaluation/run\_benchmark.py} (\texttt{--planner local|local-exact|keyword}, \texttt{--questions}), \texttt{run\_real\_datasets.py} and \texttt{make\_paper\_figures.py} (seed 42); \texttt{run\_benchmark.py --planner gemini} and \texttt{run\_llm\_direct.py} run the Gemini planner and the plain-LLM baseline given an API key.
+Code, datasets, both question sets (with the v2 hash), per-question pass/fail logs, figures and the executed test log are at \href{https://github.com/SamarthKamat/AMLBT_PROJECT}{\texttt{github.com/SamarthKamat/AMLBT\_PROJECT}}. Setup: \texttt{run\_windows.bat}, \texttt{run\_unix.sh} or \texttt{docker compose up} (Python 3.11+, Node 18+; versions pinned). Tables~\ref{tab:bench}--\ref{tab:ml} and Figs.~\ref{fig:example}--\ref{fig:gallery} are reproduced by \texttt{evaluation/run\_benchmark.py} (\texttt{--planner local|local-exact|keyword}, \texttt{--questions}), \texttt{run\_real\_datasets.py} and \texttt{make\_paper\_figures.py} (seed 42); \texttt{run\_benchmark.py --planner gemini} and \texttt{run\_llm\_direct.py} run the Gemini planner and the plain-LLM baseline given an API key.
 
 \textbf{AI use declaration.} \emph{Runtime:} Google Gemini is an optional component used only to plan questions and word verified results. \emph{Development:} in Phase~1, ChatGPT (OpenAI) was used for code assistance and, after the first review, for a design review proposing the Phase~2 modules. In Phase~2, Claude Code (Anthropic) was used to implement and refactor the backend and frontend, write the tests, draft both question sets and the evaluation scripts, run the experiments, and draft this manuscript and the documentation. The authors defined the requirements and scope, reviewed and ran the system, checked the reported results against the logs in the repository, and take responsibility for the content and conclusions.
 

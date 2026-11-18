@@ -4,10 +4,10 @@ This report records tests that were **executed**, not only defined.
 
 | Item | Value |
 |---|---|
-| Date (UTC) | 2026-11-17 |
+| Date (UTC) | 2026-11-18 |
 | Environment | Linux, Python 3.13.18, packages exactly as pinned in `backend/requirements.txt` (venv); Node 22, npm 10 |
 | Command | `cd backend && python -m pytest -q --junitxml=../evaluation/results/pytest_junit.xml` |
-| Result | **171 passed, 0 failed, 0 errors, 0 skipped** in 168.3 s |
+| Result | **172 passed, 0 failed, 0 errors, 0 skipped** in 224.8 s |
 | Machine-readable log | `evaluation/results/pytest_junit.xml` |
 
 ## Executed tests per module
@@ -22,10 +22,10 @@ This report records tests that were **executed**, not only defined.
 | `test_explainer.py` | 3 | Gemini wording rejected if it contains numbers not in the verified result |
 | `test_gemini_client.py` | 23 | Gemini error mapping, strict JSON, schema, **source scan for exec/eval/subprocess/`__import__`**, no hard-coded key/model |
 | `test_api_e2e.py` | 24 | API end to end: **all 18 operations routed on one dataset**, follow-ups, clarification, errors, Gemini-only mode, **auto mode falling back to the local planner**, new chat, sessions |
-| `test_phase2.py` | 29 | semantics, relationships (hierarchy + formula detection), data quality + cleaning, **SHAP exactness on a linear model**, one-standard-error rule, ETS/ARIMA + 95% band, no target substitution in forecasting, root-cause decomposition adds up, pivot/query/segment/EDA, reports + PDF/Excel export, local planner routing (10 questions), Phase 2 endpoints, **persistence across restart**, **auth/ownership**, rate limiting, **user exclusions ("without X") and the dominant-feature leakage warning** |
+| `test_phase2.py` | 30 | semantics, relationships (hierarchy + formula detection), data quality + cleaning, **SHAP exactness on a linear model**, one-standard-error rule, ETS/ARIMA + 95% band, no target substitution in forecasting, root-cause decomposition adds up, pivot/query/segment/EDA, reports + PDF/Excel export, local planner routing (10 questions), Phase 2 endpoints, **persistence across restart**, **auth/ownership**, rate limiting, **user exclusions ("without X") and the dominant-feature leakage warning**, **forecast divergence guard** |
 
 ## Phase 1 vs Phase 2 reconciliation
-Phase 1's paper stated "112 test functions defined"; its test report recorded 12 executed tests. Executing the Phase 1 suite here gave **141 passing test cases** (112 functions, several parametrised). Phase 2 adds 30 cases (29 in `test_phase2.py`, 1 in `test_api_e2e.py`) for **171 executed, all passing**.
+Phase 1's paper stated "112 test functions defined"; its test report recorded 12 executed tests. Executing the Phase 1 suite here gave **141 passing test cases** (112 functions, several parametrised). Phase 2 adds 31 cases (30 in `test_phase2.py`, 1 in `test_api_e2e.py`) for **172 executed, all passing**.
 
 ## Other verification
 | Check | Result |

@@ -40,3 +40,8 @@
 | No comparison | Keyword-rule router and exact-linking ablation on both sets with exact McNemar tests (UDI vs router p < 1e-8); plain-LLM and Gemini scripts provided (need an API key) | `paired_tests.json`, paper Table IV, Fig. 3 |
 | Dark screenshots unreadable in print | Replaced by vector figures drawn from the verified outputs | `report/figures/fig_example.pdf` |
 | URL typeset wrongly; stray ", ;" in Eq. 3; Superstore sampling unclear; V1 score quoted | All fixed; extract provenance documented | paper §IV, `sample_data/real/SOURCES.md` |
+
+## Final revision (after the similarity / AI reports)
+* Found and fixed a real forecasting defect while preparing figures: AIC-selected ARIMA won the Superstore backtest but diverged when refit on the full history. A sanity guard now rejects implausible refits and falls back to the next-best model (trend + seasonal; RMSE 14,238, MAPE 25.1%, 10.5% better than baseline), with a regression test.
+* New figures generated from the engine: a six-panel results gallery (ROC incl. the leakage pair, SHAP drivers, guarded forecast with 80/95% bands, root-cause waterfall, defect-injection robustness, per-dataset held-out accuracy) and per-operation accuracy / latency.
+* A recorded, unedited HR case-study session (Table VI). The paper is exactly six full pages.
