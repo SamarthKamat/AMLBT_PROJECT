@@ -12,6 +12,7 @@ import argparse
 import json
 import re
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,10 +46,19 @@ def main():
             continue
         full = (ROOT / DATASETS[ds]).read_text(encoding="utf-8", errors="ignore")
         csv = full[: args.max_chars]
-        try:
-            ans = g._generate("Answer data questions precisely.", PROMPT.format(csv=csv, q=it["q"]), json_output=False, temperature=0.0, max_tokens=2048).strip()
-        except Exception as exc:                       # an outage is recorded, not scored as a wrong answer
-            print("ERR", it["id"], str(exc)[:120])
+        ans, err = None, None
+        for attempt in range(5):                       # overload / rate limits: wait and retry
+            try:
+                ans = g._generate("Answer data questions precisely.", PROMPT.format(csv=csv, q=it["q"]), json_output=False, temperature=0.0, max_tokens=2048).strip()
+                break
+            except Exception as exc:
+                err = exc
+                if "quota exceeded for today" in str(exc).lower():
+                    break
+                time.sleep(30 * (attempt + 1))
+        if ans is None:                                # an outage is recorded, not scored as a wrong answer
+            exc = err
+            print("ERR", it["id"], str(exc)[:120], flush=True)
             rows.append({"id": it["id"], "dataset": ds, "question": it["q"], "error": str(exc)[:200], "ok": None})
             continue
         ans = ans.strip().strip("*`\"' ").splitlines()[-1].strip().strip("*`\"' ") if ans.strip() else ans
@@ -61,7 +71,7 @@ def main():
             ok = bool(m) and abs(float(m.group(0).replace(",", "")) - exp[1]) <= 0.01 * max(1.0, abs(exp[1]))
         rows.append({"id": it["id"], "dataset": ds, "question": it["q"], "expected": exp[1] if exp else "refuse", "answer": ans, "ok": ok,
                      "kind": "refusal" if it["error"] else exp[0], "csv_truncated": len(full) > args.max_chars})
-        print("OK " if ok else "BAD", it["id"], it["q"][:60], "->", ans[:40])
+        print("OK " if ok else "BAD", it["id"], it["q"][:60], "->", ans[:40], flush=True)
     done = [r for r in rows if r["ok"] is not None]
 
     def part(sub):

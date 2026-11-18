@@ -12,7 +12,7 @@ React UI (frontend/src)                                         Flask API (backe
         gemini_client.GeminiService.plan   (schema, semantics, relationship digest, ≤3 sample rows, last 4 turns)
         local_planner.LocalPlanner         (schema linking → masking → TF-IDF+LR intent model → slot filling)
                                                                 ▼
-   Validation gate  validator.validate_plan  columns exist (never substituted) · types · filters vs real values · sufficiency
+   Validation gate  validator.validate_plan  unknown columns rejected, never swapped by the gate · types · filters vs real values · sufficiency
                                                                 ▼
    Analyst / ML agent  executor.execute → OPERATION_TABLE (18 operations)
         analytics_engine     get_summary · get_current_state · compare_groups

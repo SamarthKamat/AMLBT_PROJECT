@@ -45,3 +45,14 @@
 * Found and fixed a real forecasting defect while preparing figures: AIC-selected ARIMA won the Superstore backtest but diverged when refit on the full history. A sanity guard now rejects implausible refits and falls back to the next-best model (trend + seasonal; RMSE 14,238, MAPE 25.1%, 10.5% better than baseline), with a regression test.
 * New figures generated from the engine: a six-panel results gallery (ROC incl. the leakage pair, SHAP drivers, guarded forecast with 80/95% bands, root-cause waterfall, defect-injection robustness, per-dataset held-out accuracy) and per-operation accuracy / latency.
 * A recorded, unedited HR case-study session (Table VI). The paper is exactly six full pages.
+
+## Third review (25.0/30) — changes
+
+| Issue raised | What changed | Evidence |
+|---|---|---|
+| No LLM comparison was run | Gemini reached through its OpenAI-compatible endpoint (`GEMINI_TRANSPORT=openai`, plan schema enforced); Gemini planner and a plain-LLM baseline (table pasted into the prompt) run on the held-out v3 set | `benchmark_v3_gemini.json`, `llm_direct_v3.json`, paper Table III |
+| Keyword router is an easy baseline | Kept, but now labelled a weak baseline; the main comparison is against Gemini (planner and plain LLM) | paper §V |
+| "Average volunteer age" answered with `Volunteers` contradicts "never substituted" | Fixed in the planner (compound-modifier and "how many <noun>" rules, head-noun linking, "over time" is never the OverTime column); claim narrowed to what the gate guarantees (unknown names rejected, the gate never swaps columns) and the remaining planner-side substitutions (local and Gemini) are reported | `local_planner.py`, `tests/test_phase2.py`, paper §V |
+| Held-out set leans on generated data | New frozen set v3: 100 questions on the four public datasets only, 36 must be refused; v2 split into generated vs public in the paper's Table II | `benchmark_questions_v3.jsonl` (+ hash, committed before any run) |
+| Ablation not significant on v2 | Also not significant on v3 (p = 1.0); reported as a coverage/caution trade-off, no benefit claimed | `paired_tests.json` |
+| Fig. 4 crowded, rotated labels in (d) and (f) | Panels (d) and (f) redrawn horizontally (no rotated labels), (f) now shows v3 for local, Gemini and keyword | `evaluation/results/fig_gallery.pdf` |

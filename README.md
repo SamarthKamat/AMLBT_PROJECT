@@ -85,12 +85,13 @@ cd ../backend && .venv/bin/python serve.py        # http://localhost:5000
 ## 6. Tests and evaluation
 ```bash
 cd backend
-python -m pytest -q                                    # 172 tests (offline; Gemini replaced by a test double)
+python -m pytest -q                                    # 178 tests (offline; Gemini replaced by a test double)
 cd ..
-python evaluation/run_benchmark.py --planner local --questions benchmark_questions_v2.jsonl   # frozen held-out set v2 (99 q)
+python evaluation/run_benchmark.py --planner local --questions benchmark_questions_v3.jsonl   # frozen held-out set v3 (100 q, public data)
 python evaluation/run_benchmark.py --planner keyword   # rule-based comparison (also: local-exact ablation)
-python evaluation/run_benchmark.py --planner gemini    # Gemini planner (needs a key)
-python evaluation/run_llm_direct.py                    # plain-LLM baseline (needs a key)
+python evaluation/run_benchmark.py --planner gemini --questions benchmark_questions_v3.jsonl  # Gemini planner (needs a key)
+python evaluation/paired_tests.py                      # McNemar tests and public/generated splits
+python evaluation/run_llm_direct.py --questions benchmark_questions_v3.jsonl   # plain-LLM baseline (needs a key)
 python evaluation/make_paper_figures.py                # paper figures
 python evaluation/run_real_datasets.py                 # real datasets, robustness, forecasting, reference domains
 ```
@@ -109,7 +110,7 @@ Errors are structured `{code, error, retryable}`: `INVALID_COLUMN`, `INSUFFICIEN
 * One flat table per session; no joins. Planning quality depends on column naming; ambiguous questions trigger clarification.
 * All analyses are descriptive or predictive, **not causal**: root-cause decompositions show *where* a change happened, SHAP shows what a model relies on, and impact estimates are illustrative arithmetic.
 * Trained models are cached in memory (retrained after a restart). Run one server process with several threads.
-* The local planner was evaluated on two frozen question sets (104 + 99) drafted with AI assistance, not by independent users; it is not a general-purpose language model.
+* Planners were evaluated on three frozen question sets (104 + 99 + 100; v3 on public data only) drafted with AI assistance, not by independent users. On v3 the Gemini planner was correct end to end on 87%, the offline planner on 73%. Both sometimes map a variable the table lacks onto a related existing column; the gate rejects unknown names but cannot detect that substitution.
 * Predictions can use columns that are only known after the outcome (e.g. call duration). UDI warns when one column dominates the model; exclude it with "... without <column>".
 
 ## 10. Repository map
