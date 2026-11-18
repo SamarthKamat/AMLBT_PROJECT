@@ -14,7 +14,7 @@ OUT = Path(__file__).resolve().parent / "results"
 PUBLIC = {"superstore", "hr", "telco", "bank"}
 RUNS = {"v1": {"full": "benchmark_v1_local_current", "keyword": "benchmark_v1_keyword", "local_exact": "benchmark_v1_local_exact"},
         "v2": {"full": "benchmark_v2_local_heldout", "keyword": "benchmark_v2_keyword", "local_exact": "benchmark_v2_local_exact"},
-        "v3": {"full": "benchmark_v3_local", "keyword": "benchmark_v3_keyword", "local_exact": "benchmark_v3_local_exact", "gemini": "benchmark_v3_gemini"}}
+        "v3": {"full": "benchmark_v3_local", "keyword": "benchmark_v3_keyword", "local_exact": "benchmark_v3_local_exact", "gemini": "benchmark_v3_gemini", "gemini31": "benchmark_v3_gemini31"}}
 
 
 def load(tag):
@@ -56,6 +56,22 @@ def main():
             gen = [r for r in rows if r["dataset"] not in PUBLIC]
             res["splits"][f"{qs}_{k}"] = {"all": rate(rows), "public": rate(pub), "generated": rate(gen),
                                          "refusal_all": rate(rows, "rejection_ok"), "refusal_public": rate(pub, "rejection_ok")}
+    # UDI systems vs the plain LLM (llm_direct_v3.json) on the closed-form and refusal questions of v3
+    llm_path = OUT / "llm_direct_v3.json"
+    if llm_path.exists():
+        llm = {r["id"]: r["ok"] for r in json.loads(llm_path.read_text())["rows"] if r["ok"] is not None}
+        res["vs_plain_llm"] = {}
+        for k in ("full", "gemini", "gemini31"):
+            lg = load(RUNS["v3"][k])
+            if not lg:
+                continue
+            out = {}
+            for part, key in (("closed_form", "numeric_ok"), ("refusal", "rejection_ok")):
+                a = {i: r[key] == "True" for i, r in lg.items() if r.get(key) in ("True", "False") and i in llm}
+                b = {i: {"pass": "True" if llm[i] else "False"} for i in a}
+                out[part] = mcnemar({i: {"pass": "True" if v else "False"} for i, v in a.items()}, b) | {"n": len(a)}
+            res["vs_plain_llm"][k] = out
+            print(f"v3 {k:9s} vs plain LLM {out}")
     (OUT / "paired_tests.json").write_text(json.dumps(res, indent=2))
     for k, v in res["pairs"].items():
         print(f"{k:28s} {v}")
