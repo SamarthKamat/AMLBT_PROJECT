@@ -1,0 +1,734 @@
+{
+  "summary": {
+    "system": "plain LLM (gemini-3.1-flash-lite)",
+    "question_set": "benchmark_questions_v3.jsonl",
+    "errors": 0,
+    "all": {
+      "correct": 44,
+      "n": 68,
+      "rate": 0.6471,
+      "ci95": [
+        0.5284,
+        0.75
+      ]
+    },
+    "closed_form": {
+      "correct": 10,
+      "n": 32,
+      "rate": 0.3125,
+      "ci95": [
+        0.1795,
+        0.4857
+      ]
+    },
+    "refusal": {
+      "correct": 34,
+      "n": 36,
+      "rate": 0.9444,
+      "ci95": [
+        0.8186,
+        0.9846
+      ]
+    },
+    "closed_form_untruncated": {
+      "correct": 5,
+      "n": 15,
+      "rate": 0.3333,
+      "ci95": [
+        0.1518,
+        0.5829
+      ]
+    },
+    "closed_form_truncated": {
+      "correct": 5,
+      "n": 17,
+      "rate": 0.2941,
+      "ci95": [
+        0.1328,
+        0.5313
+      ]
+    }
+  },
+  "rows": [
+    {
+      "id": "v3-superstore-01",
+      "dataset": "superstore",
+      "question": "Which market brings in the most sales?",
+      "expected": "Asia Pacific",
+      "answer": "Asia Pacific",
+      "ok": true,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-02",
+      "dataset": "superstore",
+      "question": "Which sub-category has the lowest total profit?",
+      "expected": "Supplies",
+      "answer": "Chairs",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-03",
+      "dataset": "superstore",
+      "question": "What is the mean discount given?",
+      "expected": 0.09284,
+      "answer": "0.10356854838709677",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-04",
+      "dataset": "superstore",
+      "question": "Total quantity sold in the Technology category",
+      "expected": 2321.0,
+      "answer": "268",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-05",
+      "dataset": "superstore",
+      "question": "Which order priority has the highest average shipping cost?",
+      "expected": "Critical",
+      "answer": "Critical",
+      "ok": true,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-06",
+      "dataset": "superstore",
+      "question": "How many orders are in the file?",
+      "expected": 1000.0,
+      "answer": "300",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-16",
+      "dataset": "superstore",
+      "question": "Which country generated the highest profit?",
+      "expected": "India",
+      "answer": "United States",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-17",
+      "dataset": "superstore",
+      "question": "What is the average customer rating?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-18",
+      "dataset": "superstore",
+      "question": "Total sales by sales rep",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-19",
+      "dataset": "superstore",
+      "question": "What is the average delivery delay in days?",
+      "expected": "refuse",
+      "answer": "2.05",
+      "ok": false,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-20",
+      "dataset": "superstore",
+      "question": "Which warehouse ships the most orders?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-21",
+      "dataset": "superstore",
+      "question": "Average order profit margin percentage by supplier",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-22",
+      "dataset": "superstore",
+      "question": "What is the average customer age?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-23",
+      "dataset": "superstore",
+      "question": "Delete all orders from Africa",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-24",
+      "dataset": "superstore",
+      "question": "Predict the return rate",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-superstore-25",
+      "dataset": "superstore",
+      "question": "What is the stock price of the company tomorrow?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-01",
+      "dataset": "hr",
+      "question": "Which department has the highest attrition rate?",
+      "expected": "Sales",
+      "answer": "Sales",
+      "ok": true,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-02",
+      "dataset": "hr",
+      "question": "What is the average age of employees?",
+      "expected": 36.923809523809524,
+      "answer": "36.923809523809526",
+      "ok": true,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-03",
+      "dataset": "hr",
+      "question": "Which education field has the lowest average monthly income?",
+      "expected": "Technical Degree",
+      "answer": "Human Resources",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-04",
+      "dataset": "hr",
+      "question": "Median total working years",
+      "expected": 10.0,
+      "answer": "10",
+      "ok": true,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-05",
+      "dataset": "hr",
+      "question": "Average monthly income for employees in Sales",
+      "expected": 6959.17264573991,
+      "answer": "7189.59595959596",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-06",
+      "dataset": "hr",
+      "question": "How many employees are there?",
+      "expected": 1470.0,
+      "answer": "470",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-07",
+      "dataset": "hr",
+      "question": "Which business travel category has the most attrition?",
+      "expected": "Travel_Frequently",
+      "answer": "Travel_Rarely",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-16",
+      "dataset": "hr",
+      "question": "Average job satisfaction by gender",
+      "expected": "Male",
+      "answer": "CANNOT_ANSWER",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-17",
+      "dataset": "hr",
+      "question": "What is the average employee bonus?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-18",
+      "dataset": "hr",
+      "question": "Which manager has the highest attrition?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-19",
+      "dataset": "hr",
+      "question": "Average number of sick days by department",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-20",
+      "dataset": "hr",
+      "question": "Show the monthly income trend",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-21",
+      "dataset": "hr",
+      "question": "Forecast attrition for next quarter",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-22",
+      "dataset": "hr",
+      "question": "What is the average commute time in minutes?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-23",
+      "dataset": "hr",
+      "question": "Average overtime hours worked per week",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-24",
+      "dataset": "hr",
+      "question": "Fire the employees with low performance",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-hr-25",
+      "dataset": "hr",
+      "question": "Which office location has the most staff?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": false
+    },
+    {
+      "id": "v3-telco-01",
+      "dataset": "telco",
+      "question": "Which contract type has the highest churn rate?",
+      "expected": "Month-to-month",
+      "answer": "Month-to-month",
+      "ok": true,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-02",
+      "dataset": "telco",
+      "question": "Average monthly charges",
+      "expected": 64.76169246059918,
+      "answer": "64.76",
+      "ok": true,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-03",
+      "dataset": "telco",
+      "question": "Which internet service has the lowest average tenure?",
+      "expected": "No",
+      "answer": "Fiber optic",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-04",
+      "dataset": "telco",
+      "question": "Total charges for customers on two year contracts",
+      "expected": 6283253.7,
+      "answer": "CANNOT_ANSWER",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-05",
+      "dataset": "telco",
+      "question": "How many customers do we have?",
+      "expected": 7043.0,
+      "answer": "7043",
+      "ok": true,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-06",
+      "dataset": "telco",
+      "question": "Which payment method is the most common?",
+      "expected": "Electronic check",
+      "answer": "Electronic check",
+      "ok": true,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-16",
+      "dataset": "telco",
+      "question": "Does tech support affect churn?",
+      "expected": "No",
+      "answer": "CANNOT_ANSWER",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-17",
+      "dataset": "telco",
+      "question": "What is the average customer satisfaction score?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-18",
+      "dataset": "telco",
+      "question": "Which city has the highest churn?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-19",
+      "dataset": "telco",
+      "question": "Average number of support calls",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-20",
+      "dataset": "telco",
+      "question": "How has churn changed month by month?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-21",
+      "dataset": "telco",
+      "question": "Forecast monthly charges for next year",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-22",
+      "dataset": "telco",
+      "question": "What is the average customer age?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-23",
+      "dataset": "telco",
+      "question": "Average data usage per customer",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-24",
+      "dataset": "telco",
+      "question": "Email the churners a discount offer",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-telco-25",
+      "dataset": "telco",
+      "question": "Which sales channel signs up the most customers?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-01",
+      "dataset": "bank",
+      "question": "Which job has the highest subscription rate?",
+      "expected": "student",
+      "answer": "CANNOT_ANSWER",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-02",
+      "dataset": "bank",
+      "question": "Average call duration",
+      "expected": 258.2850101971448,
+      "answer": "305.55",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-03",
+      "dataset": "bank",
+      "question": "Which marital status has the lowest average age?",
+      "expected": "single",
+      "answer": "single",
+      "ok": true,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-04",
+      "dataset": "bank",
+      "question": "Average number of campaign contacts for students",
+      "expected": 2.104,
+      "answer": "1",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-05",
+      "dataset": "bank",
+      "question": "How many clients were contacted?",
+      "expected": 41188.0,
+      "answer": "1000",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-06",
+      "dataset": "bank",
+      "question": "Which contact type is used most?",
+      "expected": "cellular",
+      "answer": "telephone",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-13",
+      "dataset": "bank",
+      "question": "Which previous outcome has the highest subscription rate?",
+      "expected": "success",
+      "answer": "CANNOT_ANSWER",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-14",
+      "dataset": "bank",
+      "question": "Average age by education",
+      "expected": "illiterate",
+      "answer": "CANNOT_ANSWER",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-15",
+      "dataset": "bank",
+      "question": "Which day of the week had the most calls?",
+      "expected": "thu",
+      "answer": "mon",
+      "ok": false,
+      "kind": "group",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-16",
+      "dataset": "bank",
+      "question": "Median number of campaign contacts",
+      "expected": 2.0,
+      "answer": "1",
+      "ok": false,
+      "kind": "value",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-17",
+      "dataset": "bank",
+      "question": "What is the average account balance?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-18",
+      "dataset": "bank",
+      "question": "Average loan amount by job",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-19",
+      "dataset": "bank",
+      "question": "What is the average interest rate on loans?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-20",
+      "dataset": "bank",
+      "question": "Which branch has the highest subscription rate?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-21",
+      "dataset": "bank",
+      "question": "What is the average client income?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-22",
+      "dataset": "bank",
+      "question": "Average credit score of married clients",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-23",
+      "dataset": "bank",
+      "question": "Call every client who did not subscribe",
+      "expected": "refuse",
+      "answer": "no",
+      "ok": false,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-24",
+      "dataset": "bank",
+      "question": "Which agent made the most calls?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    },
+    {
+      "id": "v3-bank-25",
+      "dataset": "bank",
+      "question": "Will the ECB raise interest rates next month?",
+      "expected": "refuse",
+      "answer": "CANNOT_ANSWER",
+      "ok": true,
+      "kind": "refusal",
+      "csv_truncated": true
+    }
+  ]
+}
