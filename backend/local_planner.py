@@ -92,6 +92,13 @@ FREQ_WORDS = [("hourly", "H"), ("hour", "H"), ("daily", "D"), ("day", "D"), ("we
               ("quarterly", "Q"), ("quarter", "Q"), ("yearly", "Y"), ("annual", "Y"), ("annually", "Y"), ("year", "Y")]
 FOLLOW_UP = re.compile(r"^(and|also|now|what about|how about|same|only|just|instead|but|then|ok|okay|break it down|split it|for|in)\b|\b(instead|as well|too|same for|the same|that|those|it)\b")
 NUM = r"(-?\d+(?:[.,]\d+)?)"
+ATTRIBUTE_NOUNS = {"age", "size", "salary", "wage", "gender", "sex", "height", "weight", "name", "address", "tenure", "experience",
+                   "education", "email", "phone", "nationality", "religion", "income", "price", "score", "rating", "speed", "capacity", "satisfaction"}
+ROW_NOUNS = {"row", "record", "entry", "observation", "line", "case", "item", "people", "person", "employee", "staff", "worker", "customer", "client",
+             "order", "transaction", "sale", "patient", "student", "member", "user", "account", "subscriber", "contact", "call", "event", "visit",
+             "donor", "project", "ticket", "complaint", "booking", "attendee", "participant", "household", "resident", "applicant", "product", "unique",
+             "distinct", "different", "time", "day", "month", "year", "category", "type", "group", "value"}
+TARGET_OPS = {"get_summary", "compare_groups", "analyze_trend", "forecast", "predict_value", "detect_anomalies", "pivot_table", "explain_change", "get_current_state"}
 LEAD_IN = {"please", "can", "could", "you", "would", "kindly", "hey", "i", "want", "to", "now", "then", "so", "and", "ok", "okay"}
 VERB_LIKE = {"segment", "cluster", "group", "compare", "show", "list", "rank", "count", "forecast", "predict", "sort", "filter", "plot", "chart",
              "explore", "summarise", "summarize", "describe", "report", "classify", "estimate", "model", "explain", "break"}
@@ -177,6 +184,7 @@ class SchemaLinker:
         self.roles = {c["name"]: c["role"] for c in profile["columns"]}
         self.phrases: List[Tuple[str, str, float]] = []        # (normalised phrase, column, score)
         token_owner: Dict[str, List[str]] = {}
+        head_tokens: Dict[str, str] = {}
         for c in profile["columns"]:
             name = c["name"]
             toks = column_tokens(name)
@@ -189,12 +197,16 @@ class SchemaLinker:
                     self.phrases.append(("".join(toks), name, 0.97))
             for t in set(toks):
                 token_owner.setdefault(_sing(t), []).append(name)
+            if toks:
+                head_tokens[_sing(toks[-1])] = name
         # a distinctive token ("income" in MonthlyIncome) links on its own when only one column has it
         for t, owners in ({} if exact_only else token_owner).items():
-            if len(owners) == 1 and len(t) >= 5 and t not in STOP and t not in ("id", "no", "num", "number", "code", "name", "date", "type", "level", "rate", "count", "total"):
+            # only the head noun may stand for the column: "income" -> MonthlyIncome, but "salary" must not -> PercentSalaryHike
+            if len(owners) == 1 and head_tokens.get(t) == owners[0] and len(t) >= 5 and t not in STOP and t not in ("id", "no", "num", "number", "code", "name", "date", "type", "level", "rate", "count", "total"):
                 self.phrases.append((t, owners[0], 0.85))
         for group in ([] if exact_only else SYNONYMS):
-            owners = {self.phrases[i][1] for i in range(len(self.phrases)) if self.phrases[i][0] in group or _sing(self.phrases[i][0]) in group}
+            owners = {self.phrases[i][1] for i in range(len(self.phrases)) if (self.phrases[i][0] in group or _sing(self.phrases[i][0]) in group)
+                      and head_tokens.get(_sing(self.phrases[i][0].split()[-1])) == self.phrases[i][1]}
             if len(owners) == 1:
                 owner = owners.pop()
                 for w in group:
@@ -230,6 +242,8 @@ class SchemaLinker:
                     continue
                 phrase = " ".join(tokens[i:j])
                 hit_c = next(((c, s) for p, c, s in self.phrases if p == phrase or (n == 1 and not self.exact_only and _sing(phrase) == p)), None)
+                if hit_c and phrase in ("over time", "time"):
+                    hit_c = None                    # "rising over time" is about time, not the OverTime column
                 if hit_c and n == 1 and phrase in VERB_LIKE and all(t in LEAD_IN for t in tokens[:i]) and j < len(tokens) and tokens[j] in (
                         "the", "my", "our", "all", "these", "this", "data", "customers", "employees", "records", "rows", "orders", "by", "it"):
                     hit_c = None                    # "Segment the orders": an instruction verb, not the Segment column
@@ -333,7 +347,7 @@ class LocalPlanner:
 
     def plan_question(self, question: str, df: pd.DataFrame, profile: Dict[str, Any], semantics: Dict[str, Dict[str, Any]],
                       history: Optional[List[Dict[str, Any]]] = None, pending: Optional[Dict[str, Any]] = None, key: str = "") -> Tuple[AnalysisPlan, Dict[str, Any]]:
-        lk = self.linker(df, profile, key or profile.get("dataset_name", "") + str(profile.get("rows")))
+        lk = self.linker(df, profile, key or hashlib.sha1(("|".join(map(str, df.columns)) + str(len(df))).encode()).hexdigest())
         self._native = (profile.get("date_range") or {}).get("frequency")
         roles = lk.roles
         linked = lk.link(question)
@@ -368,6 +382,12 @@ class LocalPlanner:
             info["options"] = opts
             return AnalysisPlan(**plan), info
         plan = self._fill(op, q, linked, cols, vals, roles, semantics, df, profile)
+        missing = self._missing_variable(linked, plan, profile)
+        if missing:
+            # the question names a variable the table does not have ("volunteer age", "garbage trucks"); pass the user's
+            # words on so the validation gate refuses with the list of real columns instead of answering about a neighbour
+            plan["target_column"] = missing
+            info["missing_variable"] = missing
         plan["intent"] = question
         plan["reasoning"] = f"Local intent model: {op} (p={conf:.2f}); masked form '{masked}'."
         return AnalysisPlan(**plan), info
@@ -694,6 +714,32 @@ class LocalPlanner:
             if pm and nums:
                 out.append({"column": nums[-1].column, "change_type": "percent", "value": float(pm.group(1))})
         return out
+
+    def _missing_variable(self, linked: Linked, plan: Dict[str, Any], profile: Dict[str, Any]) -> Optional[str]:
+        """Two refusal rules applied after slot filling.
+        (1) compound modifier: a column word followed by an attribute noun that is not itself a column
+            ("volunteer age", "donation size") describes a different variable than the column;
+        (2) "how many <noun>" where the noun is neither a column, a category value nor a word for the rows."""
+        toks = linked.tokens
+        taken = set()
+        for m in linked.mentions:
+            taken.update(range(m.start, m.end))
+        target = plan.get("target_column")
+        for m in linked.mentions:
+            if m.kind != "column" or m.end >= len(toks) or m.end in taken:
+                continue
+            nxt = _sing(toks[m.end])
+            if nxt in ATTRIBUTE_NOUNS and (target is None or target == m.column) and plan.get("operation") in TARGET_OPS:
+                return f"{m.text} {toks[m.end]}"
+        mm = re.search(r"\bhow many\s+((?:[a-z]+\s+){0,2}?[a-z]+?)\s+(?:are|is|were|was|do|does|did|have|has|there|in|on|we|got|deployed|exist|$)", " ".join(toks) + " ")
+        if mm and not linked.mentions and plan.get("operation") == "get_summary":
+            phrase = mm.group(1).split()
+            start = toks.index(phrase[0]) if phrase[0] in toks else -1
+            head = _sing(phrase[-1])
+            row_words = set(ROW_NOUNS) | {_sing(t) for t in re.findall(r"[a-z]+", _norm(str(profile.get("dataset_name", ""))))}
+            if start >= 0 and head not in row_words and phrase[-1] not in row_words and not any(t in STOP for t in phrase):
+                return " ".join(phrase)
+        return None
 
     def _unknown(self, linked: Linked, allow_none: bool = False) -> Optional[str]:
         """The user's own words for a variable that is not a column (passed on so the validator can reject it)."""

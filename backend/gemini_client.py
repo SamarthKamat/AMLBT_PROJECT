@@ -184,7 +184,42 @@ class GeminiService:
             self._client = genai.Client(api_key=self.api_key, http_options=genai_types.HttpOptions(timeout=self.timeout_ms))
         return self._client
 
+    def _generate_openai(self, system: str, contents: str, *, json_output: bool, temperature: float, max_tokens: int) -> str:
+        """Gemini through its OpenAI-compatible endpoint (GEMINI_TRANSPORT=openai). Same models, same key, plain HTTPS."""
+        import requests
+        if not self.api_key or not self.model:
+            self._ensure_ready()
+        body: Dict[str, Any] = {"model": self.model, "temperature": temperature, "max_tokens": max_tokens,
+                                "messages": [{"role": "system", "content": system}, {"role": "user", "content": contents}]}
+        if json_output:
+            body["response_format"] = {"type": "json_object"}
+        last = ""
+        for attempt in range(4):
+            try:
+                r = requests.post(config.GEMINI_OPENAI_BASE.rstrip("/") + "/chat/completions", json=body, timeout=self.timeout_ms / 1000,
+                                  headers={"Authorization": f"Bearer {self.api_key}"})
+            except requests.RequestException as exc:
+                last = str(exc)
+                time.sleep(2 * (attempt + 1))
+                continue
+            if r.status_code in (429, 500, 502, 503, 504):
+                last = r.text[:300]
+                time.sleep(4 * (attempt + 1))
+                continue
+            if r.status_code == 404:
+                raise UDIError("GEMINI_MODEL_UNAVAILABLE", f"Gemini model '{self.model}' is not available: {r.text[:200]}", retryable=False)
+            if r.status_code >= 400:
+                raise UDIError("GEMINI_UNAVAILABLE", f"Gemini returned an error ({r.status_code}): {r.text[:200]}", retryable=False)
+            msg = (r.json().get("choices") or [{}])[0].get("message") or {}
+            text = re.sub(r"<thought>.*?</thought>", "", msg.get("content") or "", flags=re.S).strip()
+            if not text:
+                raise UDIError("INVALID_PLAN" if json_output else "GEMINI_UNAVAILABLE", "Gemini returned an empty response.", retryable=True)
+            return text
+        raise UDIError("GEMINI_UNAVAILABLE", f"Gemini is temporarily unavailable: {last}", retryable=True)
+
     def _generate(self, system: str, contents: str, *, json_output: bool, temperature: float, max_tokens: int = 8192) -> str:
+        if config.GEMINI_TRANSPORT == "openai" and self._client is None:
+            return self._generate_openai(system, contents, json_output=json_output, temperature=temperature, max_tokens=max_tokens)
         client = self._get_client()
         if not self.model:
             raise UDIError("GEMINI_MODEL_UNAVAILABLE", "GEMINI_MODEL is not set.", retryable=False)
@@ -218,12 +253,14 @@ class GeminiService:
     # -- public API -------------------------------------------------------------------------
     def status(self, live: bool = False) -> Dict[str, Any]:
         base = {"configured": bool(self.api_key), "model": self.model or None, "sdk_installed": _SDK_OK or self._client is not None}
-        if not base["sdk_installed"]:
+        if not base["sdk_installed"] and config.GEMINI_TRANSPORT != "openai":
             return {**base, "status": "sdk_missing", "ready": False, "detail": f"google-genai is not installed ({_SDK_ERR})"}
         if not self.api_key and self._client is None:
             return {**base, "status": "no_api_key", "ready": False, "detail": "GEMINI_API_KEY is not set."}
         if not self.model:
             return {**base, "status": "no_model", "ready": False, "detail": "GEMINI_MODEL is not set."}
+        if config.GEMINI_TRANSPORT == "openai" and self._client is None:
+            base["sdk_installed"] = True
         if not live:
             return {**base, "status": "configured", "ready": True, "detail": "Key and model are configured (not yet verified)."}
         cached = self._status_cache.get("live")

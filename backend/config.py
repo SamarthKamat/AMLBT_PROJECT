@@ -19,6 +19,8 @@ def _bool(name: str, default: bool) -> bool:
 # (b) wording an explanation of an already-verified Python result.
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "").strip()
+GEMINI_TRANSPORT = os.getenv("GEMINI_TRANSPORT", "sdk").strip().lower()      # sdk | openai (OpenAI-compatible endpoint)
+GEMINI_OPENAI_BASE = os.getenv("GEMINI_OPENAI_BASE", "https://generativelanguage.googleapis.com/v1beta/openai").strip()
 GEMINI_TIMEOUT_SECONDS = int(os.getenv("GEMINI_TIMEOUT_SECONDS", "60"))
 # Up to N sample rows are included in the planning prompt (schema + stats are always sent,
 # the full dataset never is). Set to 0 to send no row-level values at all.
